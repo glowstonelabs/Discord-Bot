@@ -3,11 +3,11 @@ import areCommandsDifferent from "../../utils/areCommandsDifferent.ts";
 import getApplicationCommands from "../../utils/getApplicationCommands.ts";
 import getLocalCommands from "../../utils/getLocalCommands.ts";
 import {
-  Client,
-  ApplicationCommandOptionData,
-  ApplicationCommandOptionChoiceData,
   ApplicationCommand,
+  ApplicationCommandOptionChoiceData,
+  ApplicationCommandOptionData,
   ApplicationCommandSubGroupData,
+  Client,
 } from "discord.js";
 import { ApplicationCommandOptionType } from "https://deno.land/x/discord_api_types/v10.ts";
 

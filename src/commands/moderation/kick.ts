@@ -1,12 +1,14 @@
 import {
+  // @ts-ignore: Ignoring type errors for title
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
   Client,
+  EmbedBuilder,
+  GuildMemberRoleManager,
   Interaction as _Interaction,
   // @ts-ignore: Ignoring type errors for title
   PermissionFlagsBits as _PermissionFlagsBits,
-  EmbedBuilder,
-  ChatInputCommandInteraction,
-  // @ts-ignore: Ignoring type errors for title
-  ApplicationCommandOptionType,
+  UserResolvable,
 } from "discord.js";
 
 export default {
@@ -43,7 +45,7 @@ export default {
       );
       return;
     }
-    const targetUserId = targetUserOption.value;
+    const targetUserId = targetUserOption.value as string;
     const reason =
       (interaction.options.get("reason")?.value as string) ||
       "No reason provided.";
@@ -56,7 +58,9 @@ export default {
       );
       return;
     }
-    const targetUser = await interaction.guild.members.fetch(targetUserId);
+    const targetUser = await interaction.guild.members.fetch(
+      targetUserId as UserResolvable
+    );
 
     if (!targetUser) {
       await interaction.editReply(
@@ -73,7 +77,15 @@ export default {
     }
 
     const targetUserRolePosition = targetUser.roles.highest.position; // highest role of the target user
-    const requestUserRolePosition = interaction.member.roles.highest.position; // highest role of the user running the command
+    const requestUserRolePosition = (
+      interaction.member?.roles as GuildMemberRoleManager
+    ).highest.position; // highest role of the user running the command
+    if (requestUserRolePosition === undefined) {
+      await interaction.editReply(
+        "❌ **Error:** Your member data is not available."
+      );
+      return;
+    }
     const botMember = interaction.guild.members.me;
     if (!botMember) {
       await interaction.editReply("❌ **Error:** Bot member not found.");

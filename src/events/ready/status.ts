@@ -1,5 +1,5 @@
 // @ts-ignore: Ignoring type errors for discord.js import
-import { Client, ActivityType } from "discord.js";
+import { ActivityType, Client } from "discord.js";
 
 const setStatus = (client: Client) => {
   const status = [

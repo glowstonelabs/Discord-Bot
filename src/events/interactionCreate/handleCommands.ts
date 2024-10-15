@@ -3,7 +3,7 @@ import getLocalCommands from "../../utils/getLocalCommands.ts"; // Changed requi
 const testServer = Deno.env.get("TESTSERVER");
 const devs = Deno.env.get("DEVS")?.split(",") || [];
 
-import { Client, Interaction } from "discord.js";
+import { Client, Interaction, PermissionsBitField } from "discord.js";
 
 export default async (client: Client, interaction: Interaction) => {
   // Changed module.exports to export default
@@ -19,7 +19,11 @@ export default async (client: Client, interaction: Interaction) => {
     if (!commandObject) return;
 
     if (commandObject.devOnly) {
-      if (!devs.includes(interaction.member.id)) {
+      if (
+        !interaction.member ||
+        !("id" in interaction.member) ||
+        !devs.includes(interaction.member.id)
+      ) {
         interaction.reply({
           content: "Only developers are allowed to run this command.",
           ephemeral: true,
@@ -40,7 +44,12 @@ export default async (client: Client, interaction: Interaction) => {
 
     if (commandObject.permissionsRequired?.length) {
       for (const permission of commandObject.permissionsRequired) {
-        if (!interaction.member.permissions.has(permission)) {
+        if (
+          !interaction.member ||
+          !("permissions" in interaction.member) ||
+          !(interaction.member.permissions instanceof PermissionsBitField) ||
+          !interaction.member.permissions.has(permission)
+        ) {
           interaction.reply({
             content: "Not enough permissions.",
             ephemeral: true,

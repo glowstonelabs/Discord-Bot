@@ -2,7 +2,8 @@
   "version": "4",
   "specifiers": {
     "npm:discord.js@*": "14.16.3",
-    "npm:discord.js@^14.16.3": "14.16.3"
+    "npm:discord.js@^14.16.3": "14.16.3",
+    "npm:ms@^2.1.3": "2.1.3"
   },
   "npm": {
     "@discordjs/builders@1.9.0": {
@@ -125,6 +126,9 @@
     },
     "magic-bytes.js@1.10.0": {
       "integrity": "sha512-/k20Lg2q8LE5xiaaSkMXk4sfvI+9EGEykFS4b0CHHGWqDYU0bGUFSwchNOMA56D7TCs9GwVTkqe9als1/ns8UQ=="
+    },
+    "ms@2.1.3": {
+      "integrity": "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="
     },
     "ts-mixer@6.0.4": {
       "integrity": "sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA=="
@@ -722,7 +726,8 @@
   },
   "workspace": {
     "dependencies": [
-      "npm:discord.js@^14.16.3"
+      "npm:discord.js@^14.16.3",
+      "npm:ms@^2.1.3"
     ]
   }
 }

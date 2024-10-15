@@ -8,7 +8,6 @@ export default {
   description: "Replies with the bot's ping",
   testOnly: true,
   /**
-   *
    * @param {Client} client
    * @param {CommandInteraction} interaction
    */

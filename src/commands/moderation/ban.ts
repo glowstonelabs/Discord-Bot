@@ -1,11 +1,12 @@
 import {
-  //  @ts-ignore: Ignoring type errors for title
-  PermissionFlagsBits as _PermissionFlagsBits,
-  EmbedBuilder,
-  ChatInputCommandInteraction,
   // @ts-ignore: Ignoring type errors for title
   ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
   Client,
+  EmbedBuilder,
+  //  @ts-ignore: Ignoring type errors for title
+  PermissionFlagsBits as _PermissionFlagsBits,
+  UserResolvable,
 } from "discord.js";
 
 export default {
@@ -58,7 +59,9 @@ export default {
     await interaction.deferReply();
 
     try {
-      const targetUser = await interaction.guild?.members.fetch(targetUserId);
+      const targetUser = await interaction.guild?.members.fetch(
+        targetUserId as UserResolvable
+      );
       if (!targetUser) {
         await interaction.editReply("❌ **Error:** User not found.");
         return;

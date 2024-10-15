@@ -1,14 +1,14 @@
 import {
-  EmbedBuilder,
-  ChatInputCommandInteraction,
-  Client,
-  PermissionsBitField,
   ActionRowBuilder,
   ButtonBuilder,
   // @ts-ignore: Ignoring type errors for button style
   ButtonStyle,
+  ChatInputCommandInteraction,
+  Client,
   // @ts-ignore: Ignoring type errors for component type
   ComponentType,
+  EmbedBuilder,
+  PermissionsBitField,
 } from "discord.js";
 
 export default {
@@ -60,6 +60,10 @@ export default {
             "`/ban [user] [duration] {reason}` - Bans a user from the server.",
         },
         {
+          name: "🔨 Unban Command",
+          value: "`/unban [user] {reason}` - Unbans a user from the server.",
+        },
+        {
           name: "👢 Kick Command",
           value: "`/kick [user] {reason}` - Kicks a user from the server.",
         },
@@ -80,7 +84,9 @@ export default {
 
     const embeds = [Server];
     if (
-      interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)
+      (interaction.member?.permissions as Readonly<PermissionsBitField>).has(
+        PermissionsBitField.Flags.BanMembers
+      )
     ) {
       embeds.push(Moderation);
     }

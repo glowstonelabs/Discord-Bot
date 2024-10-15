@@ -1,8 +1,10 @@
 import {
+  //@ts-ignore Ignoring type errors for ChannelType
+  ChannelType,
   Client,
   CommandInteraction,
-  GuildChannel,
   EmbedBuilder,
+  GuildBasedChannel,
   Role,
 } from "discord.js";
 
@@ -33,13 +35,13 @@ export default {
 
       const owner = await guild.fetchOwner();
       const textChannels = guild.channels.cache.filter(
-        (c: GuildChannel) => c.type === 0
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildText
       ).size;
       const voiceChannels = guild.channels.cache.filter(
-        (c: GuildChannel) => c.type === 2
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildVoice
       ).size;
       const categoryChannels = guild.channels.cache.filter(
-        (c: GuildChannel) => c.type === 4
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildCategory
       ).size;
       const totalChannels = textChannels + voiceChannels + categoryChannels;
       const memberCount = guild.memberCount;
