@@ -1,20 +1,22 @@
 import {
-  //@ts-ignore Ignoring type errors for ChannelType
+  // @ts-ignore - no
+  ApplicationCommandOptionType as _ApplicationCommandOptionType,
+  // @ts-ignore - no
   ChannelType,
+  ChatInputCommandInteraction,
   Client,
-  CommandInteraction,
   EmbedBuilder,
   GuildBasedChannel,
   Role,
-} from "discord.js";
+} from 'discord.js';
 
 export default {
-  name: "serverinfo",
+  name: 'serverinfo',
   description: "Shows the server's information",
-  async execute(_client: Client, interaction: CommandInteraction) {
+  async execute(_client: Client, interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       interaction.reply({
-        content: "You can only run this command inside a server.",
+        content: 'You can only run this command inside a server.',
         ephemeral: true,
       });
       return;
@@ -24,7 +26,7 @@ export default {
 
     if (!guild) {
       interaction.reply({
-        content: "Guild information is not available.",
+        content: 'Guild information is not available.',
         ephemeral: true,
       });
       return;
@@ -35,97 +37,79 @@ export default {
 
       const owner = await guild.fetchOwner();
       const textChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildText
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildText,
       ).size;
       const voiceChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildVoice
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildVoice,
       ).size;
       const categoryChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildCategory
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildCategory,
       ).size;
       const totalChannels = textChannels + voiceChannels + categoryChannels;
       const memberCount = guild.memberCount;
       const roles = guild.roles.cache
-        .filter((role: Role) => role.name !== "@everyone")
+        .filter((role: Role) => role.name !== '@everyone')
         .map((role: Role) => role.name)
-        .join(", ");
+        .join(', ');
       const creationDate = guild.createdAt.toDateString();
       const boosts = guild.premiumSubscriptionCount || 0;
       const boostLevel = guild.premiumTier;
-      const emojiCount = guild.emojis.cache.size;
-      const region = guild.preferredLocale;
-      const verificationLevel = guild.verificationLevel;
-      const roleCount = guild.roles.cache.size - 1; // Exclude @everyone role
-      const bannerURL = guild.bannerURL({ size: 1024 });
+      const emojis = guild.emojis.cache.size;
 
-      const serverInfoEmbed = new EmbedBuilder()
-        // @ts-ignore: Ignoring type errors for setTitle
+      const embed = new EmbedBuilder()
+        // @ts-ignore - no
         .setTitle(`${guild.name} Server Information`)
-        .setDescription("Here are the current server statistics:")
-        .setThumbnail(guild.iconURL({ size: 256 }))
-        .setImage(bannerURL)
+        .setThumbnail(guild.iconURL({ extension: 'png' }) || '')
         .addFields(
-          { name: "👑 Owner", value: owner.user.tag, inline: true },
-          { name: "🌍 Region", value: region, inline: true },
+          { name: '👑 Owner', value: owner.user.tag, inline: true },
+          { name: '🌍 Region', value: guild.preferredLocale, inline: true },
           {
-            name: "🔒 Verification Level",
-            value: verificationLevel.toString(),
+            name: '🔒 Verification Level',
+            value: guild.verificationLevel.toString(),
+            inline: true,
+          },
+          { name: '💬 Text Channels', value: `${textChannels}`, inline: true },
+          {
+            name: '🔊 Voice Channels',
+            value: `${voiceChannels}`,
             inline: true,
           },
           {
-            name: "💬 Text Channels",
-            value: textChannels.toString(),
+            name: '📂 Category Channels',
+            value: `${categoryChannels}`,
             inline: true,
           },
           {
-            name: "🔊 Voice Channels",
-            value: voiceChannels.toString(),
+            name: '📊 Total Channels',
+            value: `${totalChannels}`,
             inline: true,
           },
+          { name: '👥 Members', value: `${memberCount}`, inline: true },
           {
-            name: "📂 Category Channels",
-            value: categoryChannels.toString(),
+            name: '🏷️ Roles',
+            value: `${guild.roles.cache.size}`,
             inline: true,
           },
-          {
-            name: "📊 Total Channels",
-            value: totalChannels.toString(),
-            inline: true,
-          },
-          { name: "👥 Members", value: memberCount.toString(), inline: true },
-          { name: "🏷️ Roles", value: roleCount.toString(), inline: true },
-          { name: "🚀 Boosts", value: boosts.toString(), inline: true },
-          {
-            name: "⭐ Boost Level",
-            value: boostLevel.toString(),
-            inline: true,
-          },
-          { name: "😀 Emojis", value: emojiCount.toString(), inline: true },
-          {
-            name: "📜 Role List",
-            value: roles.length > 1024 ? `${roles.slice(0, 1021)}...` : roles,
-          }
+          { name: '🚀 Boosts', value: `${boosts}`, inline: true },
+          { name: '⭐ Boost Level', value: `${boostLevel}`, inline: true },
+          { name: '😀 Emojis', value: `${emojis}`, inline: true },
+          { name: '📜 Role List', value: roles || 'None', inline: false },
         )
-        .setColor(0x00ae86)
         .setFooter({
           text: `ID: ${guild.id} | Server Created: ${creationDate}`,
+          iconURL: interaction.user.displayAvatarURL({ extension: 'jpg' }),
         })
+        .setColor(0x3498db)
         .setTimestamp();
 
-      await interaction.editReply({ embeds: [serverInfoEmbed] });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
-      console.error("Failed to handle interaction:", error);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content: "There was an error while executing this command!",
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content: "There was an error while executing this command!",
-          ephemeral: true,
-        });
-      }
+      console.error(`Error fetching server info: ${error}`);
+      await interaction.editReply({
+        content: '❌ **Error:** An error occurred while fetching server information.',
+        //@ts-ignore - This is a valid option
+        ephemeral: true,
+      });
     }
   },
 };

@@ -1,155 +1,119 @@
 import {
-  // @ts-ignore: Ignoring type errors for title
+  // @ts-ignore - no
   ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   Client,
   EmbedBuilder,
   GuildMemberRoleManager,
-  Interaction as _Interaction,
-  // @ts-ignore: Ignoring type errors for title
-  PermissionFlagsBits as _PermissionFlagsBits,
+  // @ts-ignore - no
+  PermissionFlagsBits,
   UserResolvable,
-} from "discord.js";
+} from 'discord.js';
 
 export default {
-  name: "kick",
-  description: "👢 Kicks a member from this server!",
+  name: 'kick',
+  description: '👢 Kicks a member from this server!',
   options: [
     {
-      name: "target-user",
-      description: "The user to kick",
+      name: 'target-user',
+      description: 'The user to kick',
       type: ApplicationCommandOptionType.User,
       required: true,
     },
     {
-      name: "reason",
-      description: "The reason for the kick",
+      name: 'reason',
+      description: 'The reason for the kick',
       type: ApplicationCommandOptionType.String,
       required: false,
     },
   ],
+  permissionsRequired: [PermissionFlagsBits.KickMembers],
+  botPermissions: [PermissionFlagsBits.KickMembers],
 
   /**
    * Execute method to handle the kick command
    * @param {Client} client - The Discord client
    * @param {ChatInputCommandInteraction} interaction - The interaction object
    */
-  execute: async (
-    _client: Client,
-    interaction: ChatInputCommandInteraction
-  ) => {
-    const targetUserOption = interaction.options.get("target-user");
+  execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
+    const targetUserOption = interaction.options.get('target-user');
     if (!targetUserOption) {
-      await interaction.editReply(
-        "❌ **Error:** Target user option is missing."
-      );
+      await interaction.reply({
+        content: '❌ **Error:** Target user option is missing.',
+        ephemeral: true,
+      });
       return;
     }
     const targetUserId = targetUserOption.value as string;
-    const reason =
-      (interaction.options.get("reason")?.value as string) ||
-      "No reason provided.";
+    const reason = (interaction.options.get('reason')?.value as string) || 'No reason provided.';
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     if (!interaction.guild) {
-      await interaction.editReply(
-        "❌ **Error:** This command can only be used in a server."
-      );
+      await interaction.editReply({
+        content: '❌ **Error:** This command can only be used in a server.',
+        // @ts-ignore - no
+        ephemeral: true,
+      });
       return;
     }
-    const targetUser = await interaction.guild.members.fetch(
-      targetUserId as UserResolvable
-    );
+    const targetUser = await interaction.guild.members.fetch(targetUserId as UserResolvable);
 
     if (!targetUser) {
-      await interaction.editReply(
-        "❌ **Error:** That user doesn't exist in this server."
-      );
+      await interaction.editReply({
+        content: "❌ **Error:** That user doesn't exist in this server.",
+        // @ts-ignore - no
+        ephemeral: true,
+      });
       return;
     }
 
-    if (targetUser.id === interaction.guild.ownerId) {
-      await interaction.editReply(
-        "❌ **Error:** You can't kick the server owner."
-      );
-      return;
-    }
-
-    const targetUserRolePosition = targetUser.roles.highest.position; // highest role of the target user
-    const requestUserRolePosition = (
-      interaction.member?.roles as GuildMemberRoleManager
-    ).highest.position; // highest role of the user running the command
-    if (requestUserRolePosition === undefined) {
-      await interaction.editReply(
-        "❌ **Error:** Your member data is not available."
-      );
-      return;
-    }
-    const botMember = interaction.guild.members.me;
-    if (!botMember) {
-      await interaction.editReply("❌ **Error:** Bot member not found.");
-      return;
-    }
-    const botRolePosition = botMember.roles.highest.position; // highest role of the bot
+    const targetUserRolePosition = targetUser.roles.highest.position;
+    const requestUserRolePosition = (interaction.member?.roles as GuildMemberRoleManager).highest
+      .position;
+    const botRolePosition = interaction.guild?.members.me?.roles.highest.position;
 
     if (targetUserRolePosition >= requestUserRolePosition) {
-      await interaction.editReply(
-        "❌ **Error:** You can't kick this user because they have a higher or equal role."
-      );
+      await interaction.editReply({
+        content: "🚫 You can't kick that user because they have the same/higher role than you.",
+        // @ts-ignore - no
+        ephemeral: true,
+      });
       return;
     }
 
-    if (targetUserRolePosition >= botRolePosition) {
-      await interaction.editReply(
-        "❌ **Error:** I can't kick this user because they have a higher or equal role than me."
-      );
+    if (botRolePosition === undefined || targetUserRolePosition >= botRolePosition) {
+      await interaction.editReply({
+        content: "🚫 I can't kick that user because they have the same/higher role than me.",
+        // @ts-ignore - no
+        ephemeral: true,
+      });
       return;
     }
 
     try {
-      const dmEmbed = new EmbedBuilder()
-        // @ts-ignore: Ignoring type errors for title
-        .setTitle("👢 You Have Been Kicked")
-        .setColor(0xffa500)
-        .setDescription(
-          `You have been kicked from **${interaction.guild.name}**.`
-        )
-        .addFields(
-          { name: "Reason", value: reason },
-          { name: "Kicked by", value: interaction.user.tag }
-        )
-        .setTimestamp()
-        .setFooter({
-          text: `Kicked by ${interaction.user.tag}`,
-          iconURL: interaction.user.displayAvatarURL({ extension: "jpg" }),
-        });
-
-      await targetUser.send({ embeds: [dmEmbed] });
-
       await targetUser.kick(reason);
 
-      const successEmbed = new EmbedBuilder()
-        // @ts-ignore: Ignoring type errors for title
-        .setTitle("👢 User Kicked")
-        .setColor(0xffa500)
+      const embed = new EmbedBuilder()
+        .setColor('#FF0000')
+        // @ts-ignore - no
+        .setTitle('User Kicked 👢')
         .setDescription(`**${targetUser.user.tag}** has been kicked.`)
-        .addFields(
-          { name: "Reason", value: reason },
-          { name: "Kicked by", value: interaction.user.tag }
-        )
-        .setTimestamp()
+        .addFields({ name: 'Reason', value: reason, inline: true })
         .setFooter({
-          text: `Kicked by ${interaction.user.tag}`,
-          iconURL: interaction.user.displayAvatarURL({ extension: "jpg" }),
-        });
-
-      await interaction.editReply({ embeds: [successEmbed] });
+          text: `Action by ${interaction.user.tag}`,
+          iconURL: interaction.user.displayAvatarURL(),
+        })
+        .setTimestamp();
+      // @ts-ignore - no
+      await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
-      const errorMessage = (error as Error).message;
-      await interaction.editReply(
-        `❌ **Error:** Failed to kick the user. ${errorMessage}`
-      );
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      await interaction.editReply({
+        content: `❌ An error occurred while trying to kick the user: ${errorMessage}`,
+        // @ts-ignore - no
+        ephemeral: true,
+      });
     }
   },
 };

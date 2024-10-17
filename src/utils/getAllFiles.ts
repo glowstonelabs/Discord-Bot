@@ -1,16 +1,13 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 /**
  * Recursively gets all files or folders from a directory.
- * @param directory - The directory to read from.
- * @param foldersOnly - Whether to return only folders.
- * @returns An array of file or folder paths.
+ * @param {string} directory - The directory to read from.
+ * @param {boolean} [foldersOnly=false] - Whether to return only folders.
+ * @returns {string[]} An array of file or folder paths.
  */
-const getAllFiles = (
-  directory: string,
-  foldersOnly: boolean = false
-): string[] => {
+const getAllFiles = (directory: string, foldersOnly: boolean = false): string[] => {
   const fileNames: string[] = [];
 
   try {
@@ -26,6 +23,8 @@ const getAllFiles = (
       } else {
         if (file.isFile()) {
           fileNames.push(filePath);
+        } else if (file.isDirectory()) {
+          fileNames.push(...getAllFiles(filePath, foldersOnly));
         }
       }
     }

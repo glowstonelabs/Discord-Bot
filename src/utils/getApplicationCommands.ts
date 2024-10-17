@@ -1,6 +1,16 @@
-import { Client } from "discord.js";
+import { ApplicationCommandManager, Client, GuildApplicationCommandManager } from 'discord.js';
 
-const getApplicationCommands = async (client: Client, guildId?: string) => {
+/**
+ * Retrieves application commands for the specified guild or globally.
+ * @param {Client} client - The Discord client.
+ * @param {string} [guildId] - The ID of the guild to retrieve commands for.
+ * @returns {Promise<ApplicationCommandManager | GuildApplicationCommandManager>} - The application commands manager.
+ * @throws {Error} - If the client application is null.
+ */
+const getApplicationCommands = async (
+  client: Client,
+  guildId?: string,
+): Promise<ApplicationCommandManager | GuildApplicationCommandManager> => {
   let applicationCommands;
 
   if (guildId) {
@@ -8,9 +18,9 @@ const getApplicationCommands = async (client: Client, guildId?: string) => {
     applicationCommands = guild.commands;
   } else {
     if (client.application) {
-      applicationCommands = await client.application.commands;
+      applicationCommands = client.application.commands;
     } else {
-      throw new Error("Client application is null");
+      throw new Error('Client application is null');
     }
   }
 

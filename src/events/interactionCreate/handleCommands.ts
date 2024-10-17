@@ -1,31 +1,41 @@
-import { config as _config } from "https://deno.land/x/dotenv/mod.ts";
-import getLocalCommands from "../../utils/getLocalCommands.ts"; // Changed require to import
-const testServer = Deno.env.get("TESTSERVER");
-const devs = Deno.env.get("DEVS")?.split(",") || [];
+import { config as _config } from 'https://deno.land/x/dotenv/mod.ts';
+import getLocalCommands from '../../utils/getLocalCommands.ts';
+import { Client, Interaction, PermissionsBitField } from 'discord.js';
 
-import { Client, Interaction, PermissionsBitField } from "discord.js";
+interface Command {
+  name: string;
+  devOnly?: boolean;
+  testOnly?: boolean;
+  permissionsRequired?: PermissionsBitField[];
+  botPermissions?: PermissionsBitField[];
+  execute: (client: Client, interaction: Interaction) => Promise<void>;
+}
 
+const testServer = Deno.env.get('TESTSERVER');
+const devs = Deno.env.get('DEVS')?.split(',') || [];
+const localCommands: Command[] = (await getLocalCommands()) as Command[];
+
+/**
+ * Handles command interactions.
+ * @param {Client} client - The Discord client.
+ * @param {Interaction} interaction - The interaction object.
+ */
 export default async (client: Client, interaction: Interaction) => {
-  // Changed module.exports to export default
   if (!interaction.isChatInputCommand()) return;
 
-  const localCommands = await getLocalCommands();
-
   try {
-    const commandObject = localCommands.find(
-      (cmd) => cmd.name === interaction.commandName
-    );
+    const commandObject = localCommands.find((cmd) => cmd.name === interaction.commandName);
 
     if (!commandObject) return;
 
     if (commandObject.devOnly) {
       if (
         !interaction.member ||
-        !("id" in interaction.member) ||
+        !('id' in interaction.member) ||
         !devs.includes(interaction.member.id)
       ) {
         interaction.reply({
-          content: "Only developers are allowed to run this command.",
+          content: 'Only developers are allowed to run this command.',
           ephemeral: true,
         });
         return;
@@ -35,57 +45,19 @@ export default async (client: Client, interaction: Interaction) => {
     if (commandObject.testOnly) {
       if (!interaction.guild || interaction.guild.id !== testServer) {
         interaction.reply({
-          content: "This command cannot be ran here.",
+          content: 'This command cannot be ran here.',
           ephemeral: true,
         });
         return;
       }
     }
 
-    if (commandObject.permissionsRequired?.length) {
-      for (const permission of commandObject.permissionsRequired) {
-        if (
-          !interaction.member ||
-          !("permissions" in interaction.member) ||
-          !(interaction.member.permissions instanceof PermissionsBitField) ||
-          !interaction.member.permissions.has(permission)
-        ) {
-          interaction.reply({
-            content: "Not enough permissions.",
-            ephemeral: true,
-          });
-          return;
-        }
-      }
-    }
-
-    if (commandObject.botPermissions?.length) {
-      for (const permission of commandObject.botPermissions) {
-        const bot = interaction.guild?.members.me;
-        if (!bot) {
-          interaction.reply({
-            content: "Bot does not have enough permissions.",
-            ephemeral: true,
-          });
-          return;
-        }
-
-        if (!bot.permissions.has(permission)) {
-          interaction.reply({
-            content: "Bot does not have enough permissions.",
-            ephemeral: true,
-          });
-          return;
-        }
-      }
-    }
-
     // Execute the command
     await commandObject.execute(client, interaction);
   } catch (error) {
-    console.error(error);
+    console.error(`Failed to handle command: ${error}`);
     interaction.reply({
-      content: "An error occurred while executing the command.",
+      content: 'There was an error while executing this command.',
       ephemeral: true,
     });
   }

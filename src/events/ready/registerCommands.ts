@@ -1,15 +1,15 @@
-import { config as _config } from "https://deno.land/x/dotenv/mod.ts";
-import areCommandsDifferent from "../../utils/areCommandsDifferent.ts";
-import getApplicationCommands from "../../utils/getApplicationCommands.ts";
-import getLocalCommands from "../../utils/getLocalCommands.ts";
+import { config as _config } from 'https://deno.land/x/dotenv/mod.ts';
+import areCommandsDifferent from '../../utils/areCommandsDifferent.ts';
+import getApplicationCommands from '../../utils/getApplicationCommands.ts';
+import getLocalCommands from '../../utils/getLocalCommands.ts';
 import {
   ApplicationCommand,
   ApplicationCommandOptionChoiceData,
   ApplicationCommandOptionData,
   ApplicationCommandSubGroupData,
   Client,
-} from "discord.js";
-import { ApplicationCommandOptionType } from "https://deno.land/x/discord_api_types/v10.ts";
+} from 'discord.js';
+import { ApplicationCommandOptionType } from 'https://deno.land/x/discord_api_types/v10.ts';
 
 interface Command {
   name: string;
@@ -18,35 +18,28 @@ interface Command {
   deleted?: boolean;
 }
 
-type Option = (
-  | ApplicationCommandOptionData
-  | ApplicationCommandSubGroupData
-) & {
+type Option = (ApplicationCommandOptionData | ApplicationCommandSubGroupData) & {
   choices?: ApplicationCommandOptionChoiceData<string | number>[];
   type: ApplicationCommandOptionType;
 };
 
-const testServer = Deno.env.get("TESTSERVER");
+const testServer = Deno.env.get('TESTSERVER');
 
+/**
+ * Registers or updates commands for the Discord bot.
+ * @param {Client} client - The Discord client.
+ */
 async function registerCommands(client: Client) {
   try {
     const localCommands = await getLocalCommands();
-    const applicationCommands = await getApplicationCommands(
-      client,
-      testServer
-    );
+    const applicationCommands = await getApplicationCommands(client, testServer);
 
     for (const localCommand of localCommands) {
-      const {
-        name,
-        description,
-        options = [],
-        deleted,
-      } = localCommand as Command;
+      const { name, description, options = [], deleted } = localCommand as Command;
 
       const existingCommand = applicationCommands.cache.find(
-        (cmd: ApplicationCommand) => cmd.name === name
-      ) as ApplicationCommand;
+        (cmd: ApplicationCommand) => cmd.name === name,
+      );
 
       if (existingCommand) {
         if (deleted) {
@@ -56,17 +49,14 @@ async function registerCommands(client: Client) {
         }
 
         if (
+          // @ts-ignore - TS doesn't like the type of existingCommand
           areCommandsDifferent(existingCommand as Command, {
             description,
             options: options.map((option) => ({
               ...option,
               choices:
-                "choices" in option
-                  ? [
-                      ...(option.choices as ApplicationCommandOptionChoiceData<
-                        string | number
-                      >[]),
-                    ]
+                'choices' in option
+                  ? [...(option.choices as ApplicationCommandOptionChoiceData<string | number>[])]
                   : undefined,
             })),
           })
@@ -80,9 +70,7 @@ async function registerCommands(client: Client) {
         }
       } else {
         if (deleted) {
-          console.log(
-            `⏩ Skipping registering command "${name}" as it's set to delete.`
-          );
+          console.log(`⏩ Skipping registering command "${name}" as it's set to delete.`);
           continue;
         }
 

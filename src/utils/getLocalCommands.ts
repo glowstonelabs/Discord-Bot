@@ -1,20 +1,24 @@
-import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
-import getAllFiles from "./getAllFiles.ts";
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import getAllFiles from './getAllFiles.ts';
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const getLocalCommands = async (exceptions: string[] = []) => {
+/**
+ * Retrieves local commands from the specified directory, excluding those in the exceptions list.
+ * @param {string[]} exceptions - List of command names to exclude.
+ * @returns {Promise<object[]>} - List of command objects.
+ */
+const getLocalCommands = async (exceptions: string[] = []): Promise<object[]> => {
   const localCommands = [];
 
-  const commandCategories = getAllFiles(
-    path.join(__dirname, "..", "commands"),
-    true
-  );
+  // Get all command categories
+  const commandCategories = getAllFiles(path.join(__dirname, '..', 'commands'), true);
 
   for (const commandCategory of commandCategories) {
+    // Get all command files in the category
     const commandFiles = getAllFiles(commandCategory);
 
     for (const commandFile of commandFiles) {
@@ -22,6 +26,7 @@ const getLocalCommands = async (exceptions: string[] = []) => {
       let commandObject;
 
       try {
+        // Dynamically import the command file
         commandObject = await import(commandURL);
       } catch (error) {
         console.error(`Failed to import ${commandFile}:`, error);
@@ -33,14 +38,16 @@ const getLocalCommands = async (exceptions: string[] = []) => {
         commandObject = commandObject.default;
       }
 
+      // Ensure the command has a name property
       if (!commandObject.name) {
         console.error(
           `Command file ${commandFile} is missing a name property. Imported object:`,
-          commandObject
+          commandObject,
         );
         continue;
       }
 
+      // Skip commands in the exceptions list
       if (exceptions.includes(commandObject.name)) {
         continue;
       }
