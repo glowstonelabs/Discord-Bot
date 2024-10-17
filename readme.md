@@ -48,12 +48,6 @@ Fusion-Bot-v2/
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-# Fusion Bot v2
-
-A powerful and flexible Discord bot built with Deno.
-
-[... previous content ...]
-
 ## License
 
 This project is licensed under the MIT License:
