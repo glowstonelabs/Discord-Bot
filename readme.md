@@ -32,7 +32,8 @@ Fusion-Bot-v2/
 ## Getting Started
 
 1. Clone the repository
-2. Install Deno: [https://deno.land/#installation](https://deno.land/#installation)
+2. Install Deno:
+   [https://deno.land/#installation](https://deno.land/#installation)
 3. Set up your `.env` file with your Discord bot token
 4. Run the bot:
    ```
@@ -42,7 +43,8 @@ Fusion-Bot-v2/
 ## Commands
 
 - **General**: `help`, `ping`, `serverinfo`
-- **Moderation**: `ban`, `kick`, `warn`, `clearwarnings`, `purge`, `timeout`, `unban`
+- **Moderation**: `ban`, `kick`, `warn`, `clearwarnings`, `purge`, `timeout`,
+  `unban`
 
 ## Contributing
 

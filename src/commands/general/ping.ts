@@ -43,7 +43,11 @@ export default {
         .setThumbnail(client.user?.displayAvatarURL() || '')
         .addFields(
           { name: '📡 Client Ping', value: `${ping}ms`, inline: true },
-          { name: '🌐 WebSocket Ping', value: `${websocketPing}ms`, inline: true },
+          {
+            name: '🌐 WebSocket Ping',
+            value: `${websocketPing}ms`,
+            inline: true,
+          },
           { name: '⏱️ Uptime', value: uptime, inline: true },
           { name: '🕒 Current Time', value: currentTime, inline: true },
           { name: '🤖 Bot', value: `${client.user?.tag}`, inline: true },

@@ -39,7 +39,11 @@ export default {
         .addFields(
           { name: '🆔 Role ID', value: role.id, inline: true },
           { name: '🎨 Color', value: role.hexColor, inline: true },
-          { name: '📅 Created At', value: role.createdAt.toDateString(), inline: true },
+          {
+            name: '📅 Created At',
+            value: role.createdAt.toDateString(),
+            inline: true,
+          },
           {
             name: '🔒 Permissions',
             value: role.permissions.toArray().join(', ') || 'None',

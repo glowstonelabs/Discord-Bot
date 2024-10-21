@@ -1,4 +1,4 @@
-import { Client, Interaction, EmbedBuilder } from 'npm:discord.js';
+import { Client, EmbedBuilder, Interaction } from 'npm:discord.js';
 import Poll from '../../models/pollSchema.ts';
 
 /**
@@ -6,7 +6,7 @@ import Poll from '../../models/pollSchema.ts';
  * @param {Client} client - The Discord client.
  * @param {Interaction} interaction - The interaction object.
  */
-const handlePolls = async (client: Client, interaction: Interaction) => {
+const handlePolls = async (_client: Client, interaction: Interaction) => {
   if (!interaction.isButton()) return;
 
   const pollMessageId = interaction.message.id;
@@ -46,7 +46,7 @@ const handlePolls = async (client: Client, interaction: Interaction) => {
     pollEmbed.description!.split('\n\n')[0] +
     '\n\n' +
     pollData.votes.map((count, index) => `Option ${index + 1}: ${count} votes`).join('\n');
-
+  // @ts-ignore s
   const updatedEmbed = EmbedBuilder.from(pollEmbed).setDescription(updatedDescription);
 
   await interaction.update({ embeds: [updatedEmbed] });

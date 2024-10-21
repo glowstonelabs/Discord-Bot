@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, EmbedBuilder, User, Role } from 'discord.js';
+import { Client, CommandInteraction, EmbedBuilder, Role, User } from 'discord.js';
 
 export default {
   name: 'userinfo',
@@ -61,8 +61,16 @@ export default {
         .addFields(
           { name: '👤 Username', value: username, inline: true },
           { name: '🆔 ID', value: targetUser.id, inline: true },
-          { name: '🤖 Bot', value: targetUser.bot ? 'Yes' : 'No', inline: true },
-          { name: '📅 Created At', value: targetUser.createdAt.toDateString(), inline: true },
+          {
+            name: '🤖 Bot',
+            value: targetUser.bot ? 'Yes' : 'No',
+            inline: true,
+          },
+          {
+            name: '📅 Created At',
+            value: targetUser.createdAt.toDateString(),
+            inline: true,
+          },
           { name: '📅 Joined Server At', value: joinDate, inline: true },
           { name: '🏷️ Nickname', value: nickname, inline: true },
           { name: '🔖 Roles', value: roles || 'None', inline: true },

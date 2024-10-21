@@ -120,7 +120,13 @@ export default {
         .setTitle('🔨 User Banned')
         .setColor(0x00ff00)
         .setDescription(`**${targetUser.user.tag}** has been banned.`)
-        .addFields({ name: 'Reason', value: reason }, { name: 'Duration', value: duration })
+        .addFields(
+          { name: 'Reason', value: reason },
+          {
+            name: 'Duration',
+            value: duration,
+          },
+        )
         .setTimestamp()
         .setFooter({
           text: `Banned by ${interaction.user.tag}`,
