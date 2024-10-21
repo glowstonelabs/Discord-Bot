@@ -2,7 +2,7 @@ import { Client, CommandInteraction, EmbedBuilder, User, Role } from 'discord.js
 
 export default {
   name: 'userinfo',
-  description: 'ℹ️ Shows information about a specific user',
+  description: 'ℹ Shows information about a specific user',
   options: [
     {
       name: 'target-user',

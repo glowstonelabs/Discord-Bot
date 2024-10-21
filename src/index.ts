@@ -1,5 +1,5 @@
 import { Client, IntentsBitField } from 'npm:discord.js';
-// import mongoose from "npm:mongoose";
+import mongoose from 'npm:mongoose';
 import eventHandler from './handlers/eventHandler.ts';
 import * as path from 'https://deno.land/std/path/mod.ts';
 import { config } from 'https://deno.land/x/dotenv/mod.ts';
@@ -20,10 +20,23 @@ const client = new Client({
     // Load environment variables from .env file
     config({ export: true });
 
-    // Uncomment and configure mongoose if using MongoDB
-    // mongoose.set("strictQuery", false);
-    // await mongoose.connect(Deno.env.get("MONGODB_URI"));
-    // console.log("Connected to DB.");
+    // Debugging: Log environment variables (optional)
+    // console.log('Environment Variables:', Deno.env.toObject());
+
+    // Connect to MongoDB
+    const mongoUri = Deno.env.get('MONGODB_URI');
+    if (!mongoUri) {
+      throw new Error('MongoDB URI is not set in environment variables');
+    }
+    // Log a generic message instead of the full URI
+    console.log('MongoDB URI retrieved successfully.');
+
+    await mongoose.connect(mongoUri, {
+      // @ts-ignore a
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to MongoDB.');
 
     // Get the directory name of the current module
     const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
