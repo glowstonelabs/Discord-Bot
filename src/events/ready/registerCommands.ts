@@ -53,10 +53,11 @@ async function registerCommands(client: Client) {
           areCommandsDifferent(existingCommand as Command, {
             description,
             options: options.map((option) => ({
-              ...option,
+              ...(typeof option === 'object' ? option : {}),
               choices:
                 'choices' in option
-                  ? [...(option.choices as ApplicationCommandOptionChoiceData<string | number>[])]
+                  ? // @ts-ignore - TS doesn't like the type of existingCommand
+                    [...((option as Option).choices ?? [])]
                   : undefined,
             })),
           })

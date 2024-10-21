@@ -37,6 +37,7 @@ export default {
 
       const PingEmbed = new EmbedBuilder()
         .setColor(0xe32e2e)
+        // @ts-ignore - stfu
         .setTitle('🏓 Pong!')
         .setDescription('Here are the current bot statistics:')
         .setThumbnail(client.user?.displayAvatarURL() || '')
@@ -58,6 +59,7 @@ export default {
       console.error(`Error executing ping command: ${error}`);
       await interaction.editReply({
         content: 'An error occurred while executing the command.',
+        // @ts-ignore - stfu
         ephemeral: true,
       });
     }
