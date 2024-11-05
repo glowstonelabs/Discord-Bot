@@ -32,7 +32,7 @@ export default {
       const uptime = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       const currentTime = new Date().toLocaleString();
       const serverCount = client.guilds.cache.size;
-      const nodeVersion = process.version;
+      const denoVerson = process.version;
       const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
 
       const PingEmbed = new EmbedBuilder()
@@ -53,7 +53,7 @@ export default {
           { name: '🤖 Bot', value: `${client.user?.tag}`, inline: true },
           { name: '🔢 Server Count', value: `${serverCount}`, inline: true },
           { name: '🛠️ Version', value: version, inline: true },
-          { name: '📦 Node.js Version', value: nodeVersion, inline: true },
+          { name: '📦 Deno Version', value: denoVerson, inline: true },
           { name: '💾 Memory Usage', value: `${memoryUsage} MB`, inline: true },
         )
         .setTimestamp();

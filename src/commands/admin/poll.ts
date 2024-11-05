@@ -84,35 +84,13 @@ export default {
 
       // @ts-ignore stfu
       const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-          // @ts-ignore stfu
-          .setCustomId('option1')
-          .setLabel('Option 1')
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          // @ts-ignore stfu
-          .setCustomId('option2')
-          .setLabel('Option 2')
-          .setStyle(ButtonStyle.Primary),
-        ...(option3
-          ? [
-              // @ts-ignore stfu
-              new ButtonBuilder()
-                // @ts-ignore stfu
-                .setCustomId('option3')
-                .setLabel('Option 3')
-                .setStyle(ButtonStyle.Primary),
-            ]
-          : []),
-        ...(option4
-          ? [
-              new ButtonBuilder()
-                // @ts-ignore stfu
-                .setCustomId('option4')
-                .setLabel('Option 4')
-                .setStyle(ButtonStyle.Primary),
-            ]
-          : []),
+        ...options.map((_, index) =>
+          new ButtonBuilder()
+            // @ts-ignore stfu
+            .setCustomId(`option_${index}`) // Consistent format: option_0, option_1, etc.
+            .setLabel(`Option ${index + 1}`) // Labels: Option 1, Option 2, etc.
+            .setStyle(ButtonStyle.Primary),
+        ),
       );
 
       const pollMessage = await interaction.reply({

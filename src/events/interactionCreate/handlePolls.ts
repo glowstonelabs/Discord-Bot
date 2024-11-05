@@ -1,15 +1,31 @@
-import { Client, EmbedBuilder, Interaction } from 'npm:discord.js';
+import {
+  ButtonInteraction as _ButtonInteraction,
+  Client,
+  EmbedBuilder,
+  Interaction,
+} from 'discord.js';
 import Poll from '../../models/pollSchema.ts';
 
-/**
- * Handles button interactions for polls.
- * @param {Client} client - The Discord client.
- * @param {Interaction} interaction - The interaction object.
- */
 const handlePolls = async (_client: Client, interaction: Interaction) => {
   if (!interaction.isButton()) return;
 
+  // Verify this is a poll interaction
+  if (!interaction.customId.startsWith('option')) return;
+
+  const userId = interaction.user.id;
   const pollMessageId = interaction.message.id;
+
+  // Improve option parsing
+  const optionStr = interaction.customId.split('_')[1];
+  const optionIndex = Number(optionStr);
+
+  // Validate option index
+  if (isNaN(optionIndex)) {
+    console.error(`Invalid option index: ${optionStr}`);
+    return;
+  }
+
+  // Find poll data
   const pollData = await Poll.findOne({ messageId: pollMessageId });
 
   if (!pollData) {
@@ -17,36 +33,45 @@ const handlePolls = async (_client: Client, interaction: Interaction) => {
     return;
   }
 
-  const userId = interaction.user.id;
-  const optionIndex = parseInt(interaction.customId.replace('option', ''), 10) - 1;
-
-  if (isNaN(optionIndex) || optionIndex < 0 || optionIndex >= pollData.votes.length) {
-    console.log('Invalid option index:', optionIndex);
+  // Validate option exists
+  if (optionIndex < 0 || optionIndex >= pollData.votes.length) {
+    console.error(`Option index out of range: ${optionIndex}`);
     return;
   }
 
-  // Find the user's previous vote, if any
-  const userVote = pollData.userVotes.find((vote) => vote.userId === userId);
+  // Check if user has already voted
+  const existingVoteIndex = pollData.userVotes.findIndex((vote) => vote.userId === userId);
 
-  if (userVote) {
-    // If the user has already voted, update their vote
-    pollData.votes[userVote.optionIndex] -= 1;
-    userVote.optionIndex = optionIndex;
+  if (existingVoteIndex >= 0) {
+    // Remove vote from previous option
+    const oldOptionIndex = pollData.userVotes[existingVoteIndex].optionIndex;
+    pollData.votes[oldOptionIndex] = Math.max(0, pollData.votes[oldOptionIndex] - 1);
+
+    // Update to new option
+    pollData.userVotes[existingVoteIndex].optionIndex = optionIndex;
   } else {
-    // If the user has not voted yet, add their vote
+    // Add new vote
     pollData.userVotes.push({ userId, optionIndex });
   }
 
-  // Update the vote count
+  // Update vote count
   pollData.votes[optionIndex] += 1;
-  await pollData.save();
+
+  try {
+    await pollData.save();
+  } catch (error) {
+    console.error('Failed to save poll:', error);
+    return;
+  }
 
   const pollEmbed = interaction.message.embeds[0];
   const updatedDescription =
     pollEmbed.description!.split('\n\n')[0] +
     '\n\n' +
-    pollData.votes.map((count, index) => `Option ${index + 1}: ${count} votes`).join('\n');
-  // @ts-ignore s
+    pollData.votes
+      .map((count: number, index: number) => `Option ${index + 1}: ${count} votes`)
+      .join('\n');
+  // @ts-ignore stfu
   const updatedEmbed = EmbedBuilder.from(pollEmbed).setDescription(updatedDescription);
 
   await interaction.update({ embeds: [updatedEmbed] });
