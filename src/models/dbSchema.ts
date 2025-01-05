@@ -1,4 +1,4 @@
-import mongoose from 'npm:mongoose';
+import mongoose from 'mongoose';
 
 /**
  * Connects to the MongoDB database.

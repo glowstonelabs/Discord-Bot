@@ -3,6 +3,7 @@ import {
   CommandInteraction,
   CommandInteractionOptionResolver,
   EmbedBuilder,
+  MessageFlags,
   User as _User,
 } from 'discord.js';
 
@@ -31,6 +32,7 @@ export default {
         .setColor(0x3498db)
         // @ts-ignore - shut up
         .setTitle(`🖼️ Avatar of ${targetUser.username}`)
+        // @ts-ignore - shut up
         .setImage(targetUser.displayAvatarURL({ dynamic: true, size: 1024 }))
         .setTimestamp()
         .setFooter({
@@ -43,7 +45,7 @@ export default {
       console.error(`Error executing avatar command: ${error}`);
       await interaction.reply({
         content: '❗ An error occurred while executing the command.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

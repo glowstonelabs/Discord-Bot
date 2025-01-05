@@ -2,6 +2,7 @@ import {
   ButtonInteraction as _ButtonInteraction,
   Client,
   EmbedBuilder,
+  // @ts-ignore
   Interaction,
 } from 'discord.js';
 import Poll from '../../models/pollSchema.ts';

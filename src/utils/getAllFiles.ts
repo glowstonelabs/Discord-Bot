@@ -1,5 +1,5 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import * as path from 'path';
+import * as fs from 'fs';
 
 /**
  * Recursively gets all files or folders from a directory.
@@ -24,7 +24,7 @@ const getAllFiles = (directory: string, foldersOnly: boolean = false): string[] 
         if (file.isFile()) {
           fileNames.push(filePath);
         } else if (file.isDirectory()) {
-          fileNames.push(...getAllFiles(filePath, foldersOnly));
+          fileNames.push(...getAllFiles(filePath));
         }
       }
     }

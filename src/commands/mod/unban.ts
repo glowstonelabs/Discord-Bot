@@ -1,9 +1,10 @@
 import {
-  // @ts-ignore - no
   ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   Client,
   EmbedBuilder,
+  MessageFlags,
+  // @ts-ignore - no
   UserResolvable,
 } from 'discord.js';
 
@@ -44,7 +45,7 @@ export default {
         await interaction.editReply({
           content: '❌ **Error:** User not found or not banned.',
           // @ts-ignore - no
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -72,7 +73,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** An error occurred while trying to unban the user.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

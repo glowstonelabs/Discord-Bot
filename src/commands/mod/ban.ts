@@ -5,8 +5,10 @@ import {
   Client,
   EmbedBuilder,
   GuildMemberRoleManager,
+  MessageFlags,
   // @ts-ignore - no
   PermissionFlagsBits,
+  // @ts-ignore - no
   UserResolvable,
 } from 'discord.js';
 
@@ -47,7 +49,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** Target user option is missing.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -63,7 +65,7 @@ export default {
         await interaction.editReply({
           content: '❌ **Error:** User not found.',
           // @ts-ignore - no
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -77,7 +79,7 @@ export default {
         await interaction.editReply({
           content: "🚫 You can't ban that user because they have the same/higher role than you.",
           // @ts-ignore - no
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -86,7 +88,7 @@ export default {
         await interaction.editReply({
           content: "🚫 I can't ban that user because they have the same/higher role than me.",
           // @ts-ignore - no
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -139,7 +141,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** An error occurred while trying to ban the user.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

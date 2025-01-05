@@ -1,16 +1,22 @@
-type Option = {
-  name: string;
-  description: string;
-  type: number;
-  required?: boolean;
-  choices?: { name: string; value: string | number }[];
-};
+import { ApplicationCommandOptionType } from 'discord.js';
 
-type Command = {
+// Define types to match registerCommands.ts
+interface CommandOption {
   name: string;
   description: string;
-  options: Option[];
-};
+  type: ApplicationCommandOptionType;
+  required?: boolean;
+  choices?: Array<{ name: string; value: string | number }>;
+}
+
+interface Command {
+  name: string;
+  description: string;
+  options?: CommandOption[];
+  category?: string;
+  permissions?: string[];
+  deleted?: boolean;
+}
 
 /**
  * Compares two sets of choices to determine if they are different.
@@ -23,22 +29,13 @@ function areChoicesDifferent(
   choices2: { name: string; value: string | number }[] = [],
 ): boolean {
   if (choices1.length !== choices2.length) {
-    console.log(`Choices length is different: ${choices1.length} vs ${choices2.length}`);
     return true;
   }
 
-  for (let i = 0; i < choices1.length; i++) {
-    if (choices1[i].name !== choices2[i].name || choices1[i].value !== choices2[i].value) {
-      console.log(
-        `Choice is different at index ${i}: "${JSON.stringify(choices1[i])}" vs "${JSON.stringify(
-          choices2[i],
-        )}"`,
-      );
-      return true;
-    }
-  }
-
-  return false;
+  return choices1.some(
+    (choice, index) =>
+      choice.name !== choices2[index].name || choice.value !== choices2[index].value,
+  );
 }
 
 /**
@@ -52,44 +49,32 @@ function cleanDescription(description: string): string {
 
 /**
  * Compares two sets of options to determine if they are different.
- * @param {Option[]} existingOptions - The existing options.
- * @param {Option[]} localOptions - The local options.
+ * @param {CommandOption[]} existingOptions - The existing options.
+ * @param {CommandOption[]} localOptions - The local options.
  * @returns {boolean} - True if the options are different, false otherwise.
  */
-function areOptionsDifferent(existingOptions: Option[] = [], localOptions: Option[] = []): boolean {
+function areOptionsDifferent(
+  existingOptions: CommandOption[] = [],
+  localOptions: CommandOption[] = [],
+): boolean {
   if (existingOptions.length !== localOptions.length) {
-    console.log(`Options length is different: ${existingOptions.length} vs ${localOptions.length}`);
     return true;
   }
 
-  for (const localOption of localOptions) {
+  return localOptions.some((localOption) => {
     const existingOption = existingOptions.find((option) => option.name === localOption.name);
 
     if (!existingOption) {
-      console.log(`Option "${localOption.name}" does not exist in existing options.`);
       return true;
     }
 
-    if (
+    return (
       cleanDescription(localOption.description) !== cleanDescription(existingOption.description) ||
       localOption.type !== existingOption.type ||
       (localOption.required ?? false) !== (existingOption.required ?? false) ||
-      (localOption.choices?.length ?? 0) !== (existingOption.choices?.length ?? 0) ||
-      areChoicesDifferent(localOption.choices ?? [], existingOption.choices ?? [])
-    ) {
-      console.log(`Option "${localOption.name}" is different:`);
-      console.log(
-        `Description: "${cleanDescription(existingOption.description)}" vs "${cleanDescription(
-          localOption.description,
-        )}"`,
-      );
-      console.log(`Type: "${existingOption.type}" vs "${localOption.type}"`);
-      console.log(`Required: "${existingOption.required}" vs "${localOption.required}"`);
-      return true;
-    }
-  }
-
-  return false;
+      areChoicesDifferent(localOption.choices, existingOption.choices)
+    );
+  });
 }
 
 /**
@@ -99,20 +84,20 @@ function areOptionsDifferent(existingOptions: Option[] = [], localOptions: Optio
  * @returns {boolean} - True if the commands are different, false otherwise.
  */
 function areCommandsDifferent(existingCommand: Command, localCommand: Command): boolean {
-  if (
-    cleanDescription(existingCommand.description) !== cleanDescription(localCommand.description) ||
-    areOptionsDifferent(existingCommand.options, localCommand.options)
-  ) {
-    console.log(`Command "${localCommand.name}" is different:`);
-    console.log(
-      `Description: "${cleanDescription(existingCommand.description)}" vs "${cleanDescription(
-        localCommand.description,
-      )}"`,
-    );
+  // Compare names
+  if (existingCommand.name !== localCommand.name) {
     return true;
   }
 
-  return false;
+  // Compare descriptions
+  if (
+    cleanDescription(existingCommand.description) !== cleanDescription(localCommand.description)
+  ) {
+    return true;
+  }
+
+  // Compare options
+  return areOptionsDifferent(existingCommand.options, localCommand.options);
 }
 
 export default areCommandsDifferent;

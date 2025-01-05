@@ -5,6 +5,7 @@ import {
   CommandInteraction,
   EmbedBuilder,
   GuildMemberRoleManager,
+  MessageFlags,
   // @ts-ignore - no
   PermissionFlagsBits,
 } from 'discord.js';
@@ -39,7 +40,7 @@ export default {
       await interaction.editReply({
         content: "❌ That user doesn't exist in this server.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -48,7 +49,7 @@ export default {
       await interaction.editReply({
         content: "🤖 I can't clear warnings for a bot.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -63,7 +64,7 @@ export default {
         content:
           "🚫 You can't clear warnings for that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -73,7 +74,7 @@ export default {
         content:
           "🚫 I can't clear warnings for that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }

@@ -1,6 +1,7 @@
-import { config as _config } from 'https://deno.land/x/dotenv/mod.ts';
+import 'dotenv/config';
 import getLocalCommands from '../../utils/getLocalCommands.ts';
-import { Client, Interaction, PermissionsBitField } from 'discord.js';
+//@ts-ignore
+import { Client, Interaction, MessageFlags, PermissionsBitField } from 'discord.js';
 
 interface Command {
   name: string;
@@ -11,8 +12,9 @@ interface Command {
   execute: (client: Client, interaction: Interaction) => Promise<void>;
 }
 
-const testServer = Deno.env.get('TESTSERVER');
-const devs = Deno.env.get('DEVS')?.split(',') || [];
+const testServer = process.env.TESTSERVER;
+const devs = process.env.DEVS?.split(',') || [];
+//@ts-ignore
 const localCommands: Command[] = (await getLocalCommands()) as Command[];
 
 /**
@@ -36,7 +38,7 @@ export default async (client: Client, interaction: Interaction) => {
       ) {
         interaction.reply({
           content: 'Only developers are allowed to run this command.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -46,19 +48,15 @@ export default async (client: Client, interaction: Interaction) => {
       if (!interaction.guild || interaction.guild.id !== testServer) {
         interaction.reply({
           content: 'This command cannot be ran here.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
     }
 
-    // Execute the command
+    // Rest of the existing code...
     await commandObject.execute(client, interaction);
   } catch (error) {
-    console.error(`Failed to handle command: ${error}`);
-    interaction.reply({
-      content: 'There was an error while executing this command.',
-      ephemeral: true,
-    });
+    console.error('Error executing command:', error);
   }
 };

@@ -1,4 +1,4 @@
-import { ApplicationCommandManager, Client, GuildApplicationCommandManager } from 'discord.js';
+import { Client, ApplicationCommandManager, GuildApplicationCommandManager } from 'discord.js';
 
 /**
  * Retrieves application commands for the specified guild or globally.
@@ -11,7 +11,7 @@ const getApplicationCommands = async (
   client: Client,
   guildId?: string,
 ): Promise<ApplicationCommandManager | GuildApplicationCommandManager> => {
-  let applicationCommands;
+  let applicationCommands: ApplicationCommandManager | GuildApplicationCommandManager;
 
   if (guildId) {
     const guild = await client.guilds.fetch(guildId);

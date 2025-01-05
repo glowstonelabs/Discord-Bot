@@ -1,6 +1,5 @@
-import mongoose, { Document, Schema } from 'npm:mongoose';
-import { v4 as uuidv4 } from 'npm:uuid';
-
+import mongoose, { Document, Schema } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 /**
  * Interface representing a vote.
  */

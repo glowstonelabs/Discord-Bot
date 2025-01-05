@@ -1,92 +1,124 @@
-import { config as _config } from 'https://deno.land/x/dotenv/mod.ts';
-import areCommandsDifferent from '../../utils/areCommandsDifferent.ts';
-import getApplicationCommands from '../../utils/getApplicationCommands.ts';
-import getLocalCommands from '../../utils/getLocalCommands.ts';
+import 'dotenv/config';
 import {
-  ApplicationCommand,
-  ApplicationCommandOptionChoiceData,
-  ApplicationCommandOptionData,
-  ApplicationCommandSubGroupData,
   Client,
+  ApplicationCommandOptionType,
+  ApplicationCommand as DiscordApplicationCommand,
 } from 'discord.js';
-import { ApplicationCommandOptionType } from 'https://deno.land/x/discord_api_types/v10.ts';
+import getLocalCommands from '../../utils/getLocalCommands.ts';
+import getApplicationCommands from '../../utils/getApplicationCommands.ts';
+import areCommandsDifferent from '../../utils/areCommandsDifferent.ts';
+
+// Define types to match utility files
+interface CommandOption {
+  name: string;
+  description: string;
+  type: ApplicationCommandOptionType;
+  required?: boolean;
+  choices?: Array<{ name: string; value: string | number }>;
+}
 
 interface Command {
   name: string;
   description: string;
-  options?: Option[];
+  options?: CommandOption[];
+  category?: string;
+  permissions?: string[];
   deleted?: boolean;
+  id?: string;
 }
 
-type Option = (ApplicationCommandOptionData | ApplicationCommandSubGroupData) & {
-  choices?: ApplicationCommandOptionChoiceData<string | number>[];
-  type: ApplicationCommandOptionType;
-};
+// Type guard to check if a command has an ID
+function isCommandWithId(cmd: Command | undefined): cmd is Command & { id: string } {
+  return cmd !== undefined && typeof cmd.id === 'string' && cmd.id.trim() !== '';
+}
 
-const testServer = Deno.env.get('TESTSERVER');
+// Enhanced error logging utility
+function logCommandError(action: string, command: Command, error?: unknown): void {
+  console.error(`Error during ${action} for command "${command.name}":`, error);
+}
 
 /**
- * Registers or updates commands for the Discord bot.
- * @param {Client} client - The Discord client.
+ * Registers and updates Discord slash commands
+ * @param client - The Discord client instance
  */
-async function registerCommands(client: Client) {
+export default async (client: Client): Promise<void> => {
   try {
+    // Validate client application
+    if (!client.application) {
+      throw new Error('Client application is not initialized');
+    }
+
+    // Get local and application commands
     const localCommands = await getLocalCommands();
-    const applicationCommands = await getApplicationCommands(client, testServer);
+    const applicationCommands = await getApplicationCommands(client);
 
+    // Process each local command
     for (const localCommand of localCommands) {
-      const { name, description, options = [], deleted } = localCommand as Command;
+      const { name, description, options, deleted } = localCommand;
 
-      const existingCommand = applicationCommands.cache.find(
-        (cmd: ApplicationCommand) => cmd.name === name,
-      );
-
-      if (existingCommand) {
+      try {
+        // Skip deleted commands
         if (deleted) {
-          await applicationCommands.delete(existingCommand.id);
-          console.log(`🗑 Deleted command "${name}".`);
+          const existingCommand = applicationCommands.cache.find(
+            //@ts-ignore
+            (cmd: Command) => cmd.name === name,
+          );
+          //@ts-ignore
+          if (isCommandWithId(existingCommand)) {
+            try {
+              await applicationCommands.delete(existingCommand.id);
+            } catch (deleteError) {
+              logCommandError('deletion', existingCommand, deleteError);
+            }
+          }
           continue;
         }
 
-        if (
-          // @ts-ignore - TS doesn't like the type of existingCommand
-          areCommandsDifferent(existingCommand as Command, {
-            description,
-            options: options.map((option) => ({
-              ...(typeof option === 'object' ? option : {}),
-              choices:
-                'choices' in option
-                  ? // @ts-ignore - TS doesn't like the type of existingCommand
-                    [...((option as Option).choices ?? [])]
-                  : undefined,
-            })),
-          })
-        ) {
-          await applicationCommands.edit(existingCommand.id, {
-            description,
-            options,
-          });
+        // Find existing command
+        //@ts-ignore
+        const existingCommand = applicationCommands.cache.find((cmd: Command) => cmd.name === name);
 
-          console.log(`🔁 Edited command "${name}".`);
+        // Update or create command
+        //@ts-ignore
+        if (isCommandWithId(existingCommand)) {
+          // Check if command needs updating
+          if (areCommandsDifferent(existingCommand, localCommand)) {
+            try {
+              await applicationCommands.edit(existingCommand.id, {
+                name,
+                description,
+                //@ts-ignore
+                options,
+              });
+            } catch (editError) {
+              logCommandError('editing', existingCommand, editError);
+            }
+          }
+        } else {
+          // Create new command
+          try {
+            await applicationCommands.create({
+              name,
+              description,
+              //@ts-ignore
+              options,
+            });
+          } catch (createError) {
+            logCommandError('creation', localCommand, createError);
+          }
         }
-      } else {
-        if (deleted) {
-          console.log(`⏩ Skipping registering command "${name}" as it's set to delete.`);
-          continue;
-        }
-
-        await applicationCommands.create({
-          name,
-          description,
-          options,
-        });
-
-        console.log(`👍 Registered command "${name}".`);
+      } catch (commandProcessingError) {
+        console.error(`Failed to process command "${name}":`, commandProcessingError);
       }
     }
-  } catch (error) {
-    console.error(`There was an error: ${error}`);
-  }
-}
+  } catch (globalError) {
+    console.error('Fatal error during command registration:', globalError);
 
-export default registerCommands;
+    // Optionally exit the process or implement retry logic
+    if (globalError instanceof Error) {
+      console.error(`Error details: ${globalError.message}`);
+      console.error(`Stack trace: ${globalError.stack}`);
+      process.exit(1);
+    }
+  }
+};

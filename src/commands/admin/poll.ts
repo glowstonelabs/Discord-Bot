@@ -1,13 +1,13 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
-  // @ts-ignore stfu
   ButtonStyle,
   Client,
   CommandInteraction,
   CommandInteractionOptionResolver,
   EmbedBuilder,
-} from 'npm:discord.js';
+  MessageFlags,
+} from 'discord.js';
 import Poll from '../../models/pollSchema.ts';
 
 export default {
@@ -96,12 +96,12 @@ export default {
       const pollMessage = await interaction.reply({
         embeds: [pollEmbed],
         components: [actionRow],
-        fetchReply: true,
+        withResponse: true,
       });
 
       // Save poll data to MongoDB
       const pollData = new Poll({
-        messageId: pollMessage.id,
+        messageId: pollMessage.resource?.message?.channel.id,
         options,
         votes: new Array(options.length).fill(0),
         userVotes: [],
@@ -112,7 +112,7 @@ export default {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: '❗ An error occurred while executing the command.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       } else if (interaction.deferred) {
         await interaction.editReply({
@@ -121,7 +121,7 @@ export default {
       } else {
         await interaction.followUp({
           content: '❗ An error occurred while executing the command.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     }

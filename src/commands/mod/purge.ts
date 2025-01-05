@@ -3,6 +3,7 @@ import {
   ApplicationCommandOptionType,
   Client,
   CommandInteraction,
+  MessageFlags,
   // @ts-ignore - no
   PermissionFlagsBits,
   TextChannel,
@@ -36,7 +37,7 @@ export default {
     if (!channel) {
       await interaction.reply({
         content: '❌ Unable to access the channel.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -44,7 +45,7 @@ export default {
     if (amount === null) {
       await interaction.reply({
         content: '❌ Please specify the number of messages you want to delete.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -52,7 +53,7 @@ export default {
     if (amount > 100) {
       await interaction.reply({
         content: '⚠️ You cannot delete more than 100 messages!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -60,7 +61,7 @@ export default {
     if (amount < 1) {
       await interaction.reply({
         content: '⚠️ You must delete at least 1 message!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -71,13 +72,13 @@ export default {
 
       await interaction.reply({
         content: `🧹 Successfully deleted ${amount} messages.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await interaction.reply({
         content: `❌ An error occurred while trying to delete messages: ${errorMessage}`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

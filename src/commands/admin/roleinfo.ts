@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, EmbedBuilder, Role } from 'discord.js';
+import { Client, CommandInteraction, EmbedBuilder, MessageFlags, Role } from 'discord.js';
 
 export default {
   name: 'roleinfo',
@@ -25,7 +25,7 @@ export default {
       if (!hasAdminRole) {
         await interaction.reply({
           content: '❗ You do not have the "Administrator" role to use this command.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -61,7 +61,7 @@ export default {
       console.error(`Error executing roleinfo command: ${error}`);
       await interaction.reply({
         content: '❗ An error occurred while executing the command.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

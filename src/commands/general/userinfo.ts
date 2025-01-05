@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, EmbedBuilder, Role, User } from 'discord.js';
+import { Client, CommandInteraction, EmbedBuilder, MessageFlags, Role, User } from 'discord.js';
 
 export default {
   name: 'userinfo',
@@ -22,7 +22,7 @@ export default {
       if (!targetUser) {
         await interaction.reply({
           content: '❗ You must specify a user to get information about.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -34,7 +34,7 @@ export default {
         await interaction.editReply({
           content: '❗ This command can only be used in a server.',
           // @ts-ignore - shut up
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -87,7 +87,7 @@ export default {
       await interaction.editReply({
         content: '❗ An error occurred while executing the command.',
         // @ts-ignore - shut up
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

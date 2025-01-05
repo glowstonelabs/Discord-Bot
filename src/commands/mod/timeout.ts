@@ -9,6 +9,7 @@ import {
   // @ts-ignore - no
   PermissionFlagsBits,
 } from 'discord.js';
+// @ts-ignore - no
 import ms from 'ms';
 
 export default {
@@ -54,7 +55,7 @@ export default {
       await interaction.editReply({
         content: "❌ That user doesn't exist in this server.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -63,7 +64,7 @@ export default {
       await interaction.editReply({
         content: "🤖 I can't timeout a bot.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -73,7 +74,7 @@ export default {
       await interaction.editReply({
         content: '❌ Please provide a valid duration between 1 second and 28 days.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -87,7 +88,7 @@ export default {
       await interaction.editReply({
         content: "🚫 You can't timeout that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -96,7 +97,7 @@ export default {
       await interaction.editReply({
         content: "🚫 I can't timeout that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -110,6 +111,7 @@ export default {
         .setTitle('User Timed Out ⏳')
         .setDescription(`**${targetUser.user.tag}** has been timed out.`)
         .addFields(
+          // @ts-ignore - no
           { name: 'Duration', value: duration, inline: true },
           { name: 'Reason', value: reason, inline: true },
         )
@@ -125,7 +127,7 @@ export default {
       await interaction.editReply({
         content: '❌ An error occurred while trying to timeout the user.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

@@ -1,49 +1,64 @@
-import * as path from 'https://deno.land/std/path/mod.ts';
+import * as path from 'path';
+import * as fs from 'fs';
+import { Client } from 'discord.js';
 import getAllFiles from '../utils/getAllFiles.ts';
-import { existsSync } from 'https://deno.land/std/fs/mod.ts';
 
-// Define types for client and event function arguments
-interface Client {
-  on: (eventName: string, handler: (arg: unknown) => Promise<void>) => void;
-}
+// Define a generic event function type
+type EventFunction = (client: Client, ...args: any[]) => Promise<void> | void;
 
 /**
- * Registers event handlers for the client.
- * @param {Client} client - The Discord client.
- * @param {string} baseDir - The base directory containing event folders.
+ * Loads and registers event handlers for the Discord bot
+ * @param client - The Discord client instance
+ * @param baseDir - Base directory containing events
  */
-export default (client: Client, baseDir: string) => {
-  const eventsDir = path.join(baseDir, 'events');
+export default async (client: Client, baseDir: string): Promise<void> => {
+  try {
+    const normalizedBaseDir = path.resolve(baseDir);
+    const eventsDir = path.join(normalizedBaseDir, 'events');
 
-  if (!existsSync(eventsDir)) {
-    console.error(`Directory does not exist: ${eventsDir}`);
-    return;
-  }
+    if (!fs.existsSync(eventsDir)) {
+      const altEventsDirs = [
+        path.join(process.cwd(), 'src', 'events'),
+        path.join(__dirname, '..', 'events'),
+        path.join(normalizedBaseDir, '..', 'events'),
+      ];
 
-  const eventFolders = getAllFiles(eventsDir, true);
+      const existingAltDir = altEventsDirs.find((dir) => fs.existsSync(dir));
 
-  for (const eventFolder of eventFolders) {
-    const eventFiles = getAllFiles(eventFolder);
-    eventFiles.sort((a, b) => (a > b ? 1 : -1));
+      if (!existingAltDir) {
+        console.warn('No valid events directory found');
+        return;
+      }
 
-    const eventName = eventFolder.replace(/\\/g, '/').split('/').pop();
+      const eventCategories = getAllFiles(existingAltDir, true);
 
-    if (eventName) {
-      client.on(eventName, async (arg) => {
+      for (const categoryPath of eventCategories) {
+        const category = path.basename(categoryPath);
+        const eventFiles = getAllFiles(categoryPath).filter((file) => file.endsWith('.ts'));
+
         for (const eventFile of eventFiles) {
           try {
-            const eventFileUrl = path.toFileUrl(eventFile).href;
-            const eventFunction = await import(eventFileUrl);
-            if (eventFunction && typeof eventFunction.default === 'function') {
-              await eventFunction.default(client, arg);
-            } else {
-              console.error(`Default export is not a function in ${eventFile}`);
+            const eventModule = await import(`file://${eventFile}`);
+            const eventHandler: EventFunction = eventModule.default;
+
+            if (typeof eventHandler === 'function') {
+              const eventName = category === 'ready' ? 'ready' : category;
+
+              client.on(eventName, async (...args) => {
+                try {
+                  await eventHandler(client, ...args);
+                } catch (handlerError) {
+                  console.error(`Error in event handler ${eventName}:`, handlerError);
+                }
+              });
             }
-          } catch (error) {
-            console.error(`Failed to import or execute ${eventFile}:`, error);
+          } catch (importError) {
+            console.error(`Error importing event file ${eventFile}:`, importError);
           }
         }
-      });
+      }
     }
+  } catch (error) {
+    console.error('Error during event handler registration:', error);
   }
 };

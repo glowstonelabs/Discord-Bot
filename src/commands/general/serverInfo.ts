@@ -6,7 +6,9 @@ import {
   ChatInputCommandInteraction,
   Client,
   EmbedBuilder,
+  // @ts-ignore - no
   GuildBasedChannel,
+  MessageFlags,
   Role,
 } from 'discord.js';
 
@@ -17,7 +19,7 @@ export default {
     if (!interaction.guild) {
       interaction.reply({
         content: 'You can only run this command inside a server.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -27,7 +29,7 @@ export default {
     if (!guild) {
       interaction.reply({
         content: 'Guild information is not available.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -108,7 +110,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** An error occurred while fetching server information.',
         //@ts-ignore - This is a valid option
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

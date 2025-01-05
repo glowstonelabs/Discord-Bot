@@ -7,6 +7,7 @@ import {
   EmbedBuilder,
   GuildMemberRoleManager,
   // @ts-ignore - no
+  MessageFlags,
   PermissionFlagsBits,
 } from 'discord.js';
 
@@ -49,7 +50,7 @@ export default {
       await interaction.editReply({
         content: "❌ That user doesn't exist in this server.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -58,7 +59,7 @@ export default {
       await interaction.editReply({
         content: "🤖 I can't warn a bot.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -68,7 +69,7 @@ export default {
       await interaction.editReply({
         content: '❌ That user is not a member of this server.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -82,7 +83,7 @@ export default {
       await interaction.editReply({
         content: "🚫 You can't warn that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -91,7 +92,7 @@ export default {
       await interaction.editReply({
         content: "🚫 I can't warn that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }

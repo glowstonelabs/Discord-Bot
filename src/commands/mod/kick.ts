@@ -5,8 +5,10 @@ import {
   Client,
   EmbedBuilder,
   GuildMemberRoleManager,
+  MessageFlags,
   // @ts-ignore - no
   PermissionFlagsBits,
+  // @ts-ignore - no
   UserResolvable,
 } from 'discord.js';
 
@@ -40,7 +42,7 @@ export default {
     if (!targetUserOption) {
       await interaction.reply({
         content: '❌ **Error:** Target user option is missing.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -53,7 +55,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** This command can only be used in a server.',
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -63,7 +65,7 @@ export default {
       await interaction.editReply({
         content: "❌ **Error:** That user doesn't exist in this server.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -77,7 +79,7 @@ export default {
       await interaction.editReply({
         content: "🚫 You can't kick that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -86,7 +88,7 @@ export default {
       await interaction.editReply({
         content: "🚫 I can't kick that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -112,7 +114,7 @@ export default {
       await interaction.editReply({
         content: `❌ An error occurred while trying to kick the user: ${errorMessage}`,
         // @ts-ignore - no
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },
