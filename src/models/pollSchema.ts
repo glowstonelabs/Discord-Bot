@@ -22,7 +22,12 @@ interface IPoll extends Document {
  * Schema for the Poll model.
  */
 const pollSchema: Schema = new Schema({
-  messageId: { type: String, required: true, unique: true, default: uuidv4 },
+  messageId: {
+    type: String,
+    required: true,
+    unique: true,
+    default: uuidv4,
+  },
   options: { type: [String], required: true },
   votes: { type: [Number], required: true },
   userVotes: {

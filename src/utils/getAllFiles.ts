@@ -1,38 +1,32 @@
-import * as path from 'path';
+// src/utils/getAllFiles.ts
 import * as fs from 'fs';
+import * as path from 'path';
 
 /**
- * Recursively gets all files or folders from a directory.
- * @param {string} directory - The directory to read from.
- * @param {boolean} [foldersOnly=false] - Whether to return only folders.
- * @returns {string[]} An array of file or folder paths.
+ * Recursively get all files in a directory
+ * @param directory - The directory to search
+ * @param foldersOnly - Whether to return only folders
+ * @returns Array of file or folder paths
  */
-const getAllFiles = (directory: string, foldersOnly: boolean = false): string[] => {
-  const fileNames: string[] = [];
-
-  try {
-    const files = fs.readdirSync(directory, { withFileTypes: true });
-
-    for (const file of files) {
-      const filePath = path.join(directory, file.name);
-
-      if (foldersOnly) {
-        if (file.isDirectory()) {
-          fileNames.push(filePath);
-        }
-      } else {
-        if (file.isFile()) {
-          fileNames.push(filePath);
-        } else if (file.isDirectory()) {
-          fileNames.push(...getAllFiles(filePath));
-        }
-      }
-    }
-  } catch (error) {
-    console.error(`Error reading directory ${directory}:`, error);
+export default function getAllFiles(directory: string, foldersOnly = false): string[] {
+  // Ensure directory exists
+  if (!fs.existsSync(directory)) {
+    console.warn(`Directory not found: ${directory}`);
+    return [];
   }
 
-  return fileNames;
-};
+  // Read directory contents
+  const fileStats = fs.readdirSync(directory, { withFileTypes: true });
 
-export default getAllFiles;
+  // Map directory entries to full paths
+  let files = fileStats.map((file) => path.join(directory, file.name));
+
+  if (foldersOnly) {
+    return files.filter((file) => fs.statSync(file).isDirectory());
+  }
+
+  return files.filter((file) => {
+    const stats = fs.statSync(file);
+    return stats.isFile() && path.extname(file) === '.ts';
+  });
+}

@@ -1,124 +1,128 @@
+// src/events/ready/registerCommands.ts
 import 'dotenv/config';
 import {
   Client,
+  ApplicationCommand,
   ApplicationCommandOptionType,
-  ApplicationCommand as DiscordApplicationCommand,
+  // @ts-ignore
+  ApplicationCommandOptionData,
+  // @ts-ignore
+  ApplicationCommandSubGroupData,
+  // @ts-ignore
+  ApplicationCommandOptionChoiceData,
 } from 'discord.js';
 import getLocalCommands from '../../utils/getLocalCommands.ts';
 import getApplicationCommands from '../../utils/getApplicationCommands.ts';
 import areCommandsDifferent from '../../utils/areCommandsDifferent.ts';
 
-// Define types to match utility files
-interface CommandOption {
-  name: string;
-  description: string;
+// Refined type definitions
+type Option = (ApplicationCommandOptionData | ApplicationCommandSubGroupData) & {
+  choices?: ApplicationCommandOptionChoiceData<string | number>[];
   type: ApplicationCommandOptionType;
-  required?: boolean;
-  choices?: Array<{ name: string; value: string | number }>;
-}
+};
 
 interface Command {
   name: string;
   description: string;
-  options?: CommandOption[];
-  category?: string;
-  permissions?: string[];
+  options?: Option[];
   deleted?: boolean;
-  id?: string;
-}
-
-// Type guard to check if a command has an ID
-function isCommandWithId(cmd: Command | undefined): cmd is Command & { id: string } {
-  return cmd !== undefined && typeof cmd.id === 'string' && cmd.id.trim() !== '';
-}
-
-// Enhanced error logging utility
-function logCommandError(action: string, command: Command, error?: unknown): void {
-  console.error(`Error during ${action} for command "${command.name}":`, error);
 }
 
 /**
- * Registers and updates Discord slash commands
- * @param client - The Discord client instance
+ * Comprehensive slash command registration process
+ * @param client - The Discord client
  */
 export default async (client: Client): Promise<void> => {
   try {
-    // Validate client application
-    if (!client.application) {
-      throw new Error('Client application is not initialized');
-    }
+    // Get test server from environment variables
+    const testServer = process.env.TESTSERVER;
 
-    // Get local and application commands
+    // Retrieve application commands and local commands
+    const applicationCommands = await getApplicationCommands(client, testServer);
     const localCommands = await getLocalCommands();
-    const applicationCommands = await getApplicationCommands(client);
 
-    // Process each local command
-    for (const localCommand of localCommands) {
-      const { name, description, options, deleted } = localCommand;
+    // Fetch existing commands
+    // @ts-ignore
+    const existingCommands = await applicationCommands.fetch();
 
-      try {
-        // Skip deleted commands
-        if (deleted) {
-          const existingCommand = applicationCommands.cache.find(
-            //@ts-ignore
-            (cmd: Command) => cmd.name === name,
-          );
-          //@ts-ignore
-          if (isCommandWithId(existingCommand)) {
-            try {
-              await applicationCommands.delete(existingCommand.id);
-            } catch (deleteError) {
-              logCommandError('deletion', existingCommand, deleteError);
-            }
-          }
-          continue;
-        }
+    // Create sets for tracking
+    const localCommandNames = new Set(localCommands.map((cmd) => cmd.name));
+    const processedCommandNames = new Set<string>();
 
-        // Find existing command
-        //@ts-ignore
-        const existingCommand = applicationCommands.cache.find((cmd: Command) => cmd.name === name);
-
-        // Update or create command
-        //@ts-ignore
-        if (isCommandWithId(existingCommand)) {
-          // Check if command needs updating
-          if (areCommandsDifferent(existingCommand, localCommand)) {
-            try {
-              await applicationCommands.edit(existingCommand.id, {
-                name,
-                description,
-                //@ts-ignore
-                options,
-              });
-            } catch (editError) {
-              logCommandError('editing', existingCommand, editError);
-            }
-          }
-        } else {
-          // Create new command
-          try {
-            await applicationCommands.create({
-              name,
-              description,
-              //@ts-ignore
-              options,
-            });
-          } catch (createError) {
-            logCommandError('creation', localCommand, createError);
-          }
-        }
-      } catch (commandProcessingError) {
-        console.error(`Failed to process command "${name}":`, commandProcessingError);
+    // First pass: Remove obsolete commands
+    for (const [, existingCommand] of existingCommands) {
+      // If the existing command is not in local commands, delete it
+      if (!localCommandNames.has(existingCommand.name)) {
+        await applicationCommands.delete(existingCommand.id);
+        console.log(`🗑 Deleted obsolete command: "${existingCommand.name}"`);
       }
     }
-  } catch (globalError) {
-    console.error('Fatal error during command registration:', globalError);
 
-    // Optionally exit the process or implement retry logic
-    if (globalError instanceof Error) {
-      console.error(`Error details: ${globalError.message}`);
-      console.error(`Stack trace: ${globalError.stack}`);
-      process.exit(1);
+    // Second pass: Register or update commands
+    for (const localCommand of localCommands) {
+      const { name, description, options = [], deleted } = localCommand as Command;
+
+      // Skip if already processed or marked for deletion
+      if (processedCommandNames.has(name) || deleted) {
+        if (deleted) {
+          console.log(`⏩ Skipping deleted command "${name}"`);
+        } else {
+          console.warn(`⚠️ Duplicate command name detected: "${name}". Skipping.`);
+        }
+        continue;
+      }
+
+      // Find existing command
+      const existingCommand = existingCommands.find((cmd) => cmd.name === name);
+
+      // Prepare command data
+      const commandData = {
+        name,
+        description,
+        options: options.length > 0 ? options : undefined,
+      };
+
+      try {
+        if (existingCommand) {
+          // Check if command needs updating
+          const commandDifference = areCommandsDifferent(
+            {
+              name: existingCommand.name,
+              description: existingCommand.description,
+              options: existingCommand.options as Option[] | undefined,
+            },
+            commandData,
+          );
+
+          // Update only if there are differences
+          if (commandDifference) {
+            await applicationCommands.edit(existingCommand.id, commandData);
+            console.log(`🔁 Updated command: "${name}"`);
+          } else {
+            console.log(`✅ Command "${name}" is up to date`);
+          }
+        } else if (!deleted) {
+          // Create new command only if not deleted
+          await applicationCommands.create(commandData);
+          console.log(`👍 Registered new command: "${name}"`);
+        }
+
+        // Mark command as processed
+        processedCommandNames.add(name);
+      } catch (error) {
+        console.error(`❌ Error processing command "${name}":`, error);
+      }
+    }
+
+    console.log('✨ Command registration process completed.');
+    console.log(`📊 Total commands processed: ${processedCommandNames.size}`);
+  } catch (error) {
+    console.error(`❌ Fatal error during command registration:`, error);
+
+    // Detailed error logging
+    if (error instanceof Error) {
+      console.error(`Error details: ${error.message}`);
+      console.error(`Stack trace: ${error.stack}`);
     }
   }
 };

@@ -1,31 +1,27 @@
-import { Client, ApplicationCommandManager, GuildApplicationCommandManager } from 'discord.js';
+// src/utils/getApplicationCommands.ts
+import { Client } from 'discord.js';
 
 /**
- * Retrieves application commands for the specified guild or globally.
- * @param {Client} client - The Discord client.
- * @param {string} [guildId] - The ID of the guild to retrieve commands for.
- * @returns {Promise<ApplicationCommandManager | GuildApplicationCommandManager>} - The application commands manager.
- * @throws {Error} - If the client application is null.
+ * Retrieves application commands for a given client
+ * @param client - The Discord client
+ * @param testServer - Optional test server ID
+ * @returns Application commands
  */
-const getApplicationCommands = async (
-  client: Client,
-  guildId?: string,
-): Promise<ApplicationCommandManager | GuildApplicationCommandManager> => {
-  let applicationCommands: ApplicationCommandManager | GuildApplicationCommandManager;
-
-  if (guildId) {
-    const guild = await client.guilds.fetch(guildId);
-    applicationCommands = guild.commands;
-  } else {
-    if (client.application) {
-      applicationCommands = client.application.commands;
-    } else {
-      throw new Error('Client application is null');
-    }
+export default async function getApplicationCommands(client: Client, testServer?: string) {
+  // Validate client application
+  if (!client.application) {
+    throw new Error('Client application is not initialized');
   }
 
-  await applicationCommands.fetch({ withLocalizations: true });
-  return applicationCommands;
-};
+  // Retrieve commands for global or guild scope
+  if (testServer) {
+    const guild = client.guilds.cache.get(testServer);
+    if (!guild) {
+      throw new Error(`Test server with ID ${testServer} not found`);
+    }
+    return guild.commands;
+  }
 
-export default getApplicationCommands;
+  // Return global application commands
+  return client.application.commands;
+}

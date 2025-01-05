@@ -1,7 +1,9 @@
+// src/utils/getLocalCommands.ts
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { ApplicationCommandOptionType } from 'discord.js';
 import getAllFiles from './getAllFiles.ts';
+import fs from 'fs/promises';
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -20,18 +22,17 @@ interface Command {
   name: string;
   description: string;
   options?: CommandOption[];
-  category?: string;
-  permissions?: string[];
   deleted?: boolean;
 }
 
 /**
- * Retrieves local commands from the specified directory, excluding those in the exceptions list.
- * @param {string[]} exceptions - List of command names to exclude.
- * @returns {Promise<Command[]>} - List of command objects.
+ * Retrieves local commands from the specified directory
+ * @param exceptions - List of command names to exclude
+ * @returns List of command objects
  */
 const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> => {
   const localCommands: Command[] = [];
+  const processedCommandNames = new Set<string>();
 
   // Get all command categories
   const commandCategories = getAllFiles(path.join(__dirname, '..', 'commands'), true);
@@ -41,33 +42,57 @@ const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> =
     const commandFiles = getAllFiles(commandCategory);
 
     for (const commandFile of commandFiles) {
-      const commandURL = pathToFileURL(commandFile).href;
-      let commandObject: Command;
-
       try {
+        // Check if file still exists
+        await fs.access(commandFile);
+
         // Dynamically import the command file
+        const commandURL = pathToFileURL(commandFile).href;
         const importedModule = await import(commandURL);
-        commandObject = importedModule.default || importedModule;
+        const commandObject = importedModule.default || importedModule;
+
+        // Validate command object
+        if (!commandObject.name || !commandObject.description) {
+          console.error(
+            `Command file ${commandFile} is missing required properties. Imported object:`,
+            commandObject,
+          );
+          continue;
+        }
+
+        // Skip commands in the exceptions list
+        if (exceptions.includes(commandObject.name)) {
+          continue;
+        }
+
+        // Prevent duplicate command names
+        if (processedCommandNames.has(commandObject.name)) {
+          console.warn(`Duplicate command name detected: "${commandObject.name}". Skipping.`);
+          continue;
+        }
+
+        // Always add the command, even if it's marked for deletion
+        localCommands.push(commandObject);
+        processedCommandNames.add(commandObject.name);
       } catch (error) {
-        console.error(`Failed to import ${commandFile}:`, error);
-        continue;
-      }
+        // If file doesn't exist or can't be imported, mark as deleted
+        console.warn(`Command file ${commandFile} not found or could not be imported.`);
 
-      // Validate command object
-      if (!commandObject.name || !commandObject.description) {
-        console.error(
-          `Command file ${commandFile} is missing required properties. Imported object:`,
-          commandObject,
-        );
-        continue;
-      }
+        // Extract command name from filename
+        const commandName = path.basename(commandFile, path.extname(commandFile));
 
-      // Skip commands in the exceptions list
-      if (exceptions.includes(commandObject.name)) {
-        continue;
-      }
+        const deletedCommand: Command = {
+          name: commandName,
+          description: `Deleted command: ${commandName}`,
+          deleted: true,
+        };
 
-      localCommands.push(commandObject);
+        // Check for duplicate deleted command names
+        if (!processedCommandNames.has(commandName)) {
+          localCommands.push(deletedCommand);
+          processedCommandNames.add(commandName);
+        }
+      }
     }
   }
 
