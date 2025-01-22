@@ -66,7 +66,7 @@ export default {
           { name: '👑 Owner', value: owner.user.tag, inline: true },
           { name: '🌍 Region', value: guild.preferredLocale, inline: true },
           {
-            name: '🔒 Verification Level',
+            name: '🔒 Security Level',
             value: guild.verificationLevel.toString(),
             inline: true,
           },
