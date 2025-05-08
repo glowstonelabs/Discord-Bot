@@ -43,7 +43,10 @@ export default {
    * @param {Client} client - The Discord client
    * @param {ChatInputCommandInteraction} interaction - The interaction object
    */
-  execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
+  execute: async (
+    _client: Client,
+    interaction: ChatInputCommandInteraction
+  ) => {
     const targetUserOption = interaction.options.get('target-user');
     if (!targetUserOption) {
       await interaction.editReply({
@@ -54,13 +57,18 @@ export default {
       return;
     }
     const targetUserId = targetUserOption.value as string;
-    const reason = (interaction.options.get('reason')?.value as string) || 'No reason provided.';
-    const duration = (interaction.options.get('duration')?.value as string) || 'Permanent';
+    const reason =
+      (interaction.options.get('reason')?.value as string) ||
+      'No reason provided.';
+    const duration =
+      (interaction.options.get('duration')?.value as string) || 'Permanent';
 
     await interaction.deferReply({ ephemeral: true });
 
     try {
-      const targetUser = await interaction.guild?.members.fetch(targetUserId as UserResolvable);
+      const targetUser = await interaction.guild?.members.fetch(
+        targetUserId as UserResolvable
+      );
       if (!targetUser) {
         await interaction.editReply({
           content: '❌ **Error:** User not found.',
@@ -71,22 +79,29 @@ export default {
       }
 
       const targetUserRolePosition = targetUser.roles.highest.position;
-      const requestUserRolePosition = (interaction.member?.roles as GuildMemberRoleManager).highest
-        .position;
-      const botRolePosition = interaction.guild?.members.me?.roles.highest.position;
+      const requestUserRolePosition = (
+        interaction.member?.roles as GuildMemberRoleManager
+      ).highest.position;
+      const botRolePosition =
+        interaction.guild?.members.me?.roles.highest.position;
 
       if (targetUserRolePosition >= requestUserRolePosition) {
         await interaction.editReply({
-          content: "🚫 You can't ban that user because they have the same/higher role than you.",
+          content:
+            "🚫 You can't ban that user because they have the same/higher role than you.",
           // @ts-ignore - no
           flags: MessageFlags.Ephemeral,
         });
         return;
       }
 
-      if (botRolePosition === undefined || targetUserRolePosition >= botRolePosition) {
+      if (
+        botRolePosition === undefined ||
+        targetUserRolePosition >= botRolePosition
+      ) {
         await interaction.editReply({
-          content: "🚫 I can't ban that user because they have the same/higher role than me.",
+          content:
+            "🚫 I can't ban that user because they have the same/higher role than me.",
           // @ts-ignore - no
           flags: MessageFlags.Ephemeral,
         });
@@ -97,11 +112,13 @@ export default {
         // @ts-ignore - no
         .setTitle('🔨 You Have Been Banned')
         .setColor(0xff0000)
-        .setDescription(`You have been banned from **${interaction.guild?.name}**.`)
+        .setDescription(
+          `You have been banned from **${interaction.guild?.name}**.`
+        )
         .addFields(
           { name: 'Reason', value: reason },
           { name: 'Banned by', value: interaction.user.tag },
-          { name: 'Duration', value: duration },
+          { name: 'Duration', value: duration }
         )
         .setTimestamp()
         .setFooter({
@@ -127,7 +144,7 @@ export default {
           {
             name: 'Duration',
             value: duration,
-          },
+          }
         )
         .setTimestamp()
         .setFooter({
@@ -139,7 +156,8 @@ export default {
     } catch (error) {
       console.error(`Error banning user: ${error}`);
       await interaction.editReply({
-        content: '❌ **Error:** An error occurred while trying to ban the user.',
+        content:
+          '❌ **Error:** An error occurred while trying to ban the user.',
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });

@@ -1,4 +1,9 @@
-import { Client, CommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  EmbedBuilder,
+  MessageFlags,
+} from 'discord.js';
 import process from 'process';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -56,7 +61,9 @@ export default {
       // Try to find the owner in the current guild
       if (botOwner?.owner?.id && interaction.guild) {
         try {
-          const guildMember = await interaction.guild.members.fetch(botOwner.owner.id);
+          const guildMember = await interaction.guild.members.fetch(
+            botOwner.owner.id
+          );
           if (guildMember) {
             // Mention the owner using their user ID
             ownerDisplay = `<@${guildMember.user.id}>`;
@@ -120,7 +127,7 @@ export default {
             name: '💻 Platform',
             value: `\`${process.platform}\``,
             inline: true,
-          },
+          }
         )
         .setFooter({
           text: `Requested by ${interaction.user.username}`,

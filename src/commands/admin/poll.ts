@@ -47,24 +47,21 @@ export default {
   ],
   execute: async (_client: Client, interaction: CommandInteraction) => {
     try {
-      const question = (interaction.options as CommandInteractionOptionResolver).getString(
-        'question',
-        true,
-      );
-      const option1 = (interaction.options as CommandInteractionOptionResolver).getString(
-        'option1',
-        true,
-      );
-      const option2 = (interaction.options as CommandInteractionOptionResolver).getString(
-        'option2',
-        true,
-      );
-      const option3 = (interaction.options as CommandInteractionOptionResolver).getString(
-        'option3',
-      );
-      const option4 = (interaction.options as CommandInteractionOptionResolver).getString(
-        'option4',
-      );
+      const question = (
+        interaction.options as CommandInteractionOptionResolver
+      ).getString('question', true);
+      const option1 = (
+        interaction.options as CommandInteractionOptionResolver
+      ).getString('option1', true);
+      const option2 = (
+        interaction.options as CommandInteractionOptionResolver
+      ).getString('option2', true);
+      const option3 = (
+        interaction.options as CommandInteractionOptionResolver
+      ).getString('option3');
+      const option4 = (
+        interaction.options as CommandInteractionOptionResolver
+      ).getString('option4');
       const options = [option1, option2, option3, option4].filter(Boolean);
 
       const pollDescription = options
@@ -89,8 +86,8 @@ export default {
             // @ts-ignore stfu
             .setCustomId(`option_${index}`) // Consistent format: option_0, option_1, etc.
             .setLabel(`Option ${index + 1}`) // Labels: Option 1, Option 2, etc.
-            .setStyle(ButtonStyle.Primary),
-        ),
+            .setStyle(ButtonStyle.Primary)
+        )
       );
 
       const pollMessage = await interaction.reply({

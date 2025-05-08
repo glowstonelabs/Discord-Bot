@@ -19,7 +19,10 @@ export default {
    * @param {Client} client
    * @param {ChatInputCommandInteraction} interaction
    */
-  execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
+  execute: async (
+    _client: Client,
+    interaction: ChatInputCommandInteraction
+  ) => {
     const Server = new EmbedBuilder()
       // @ts-ignore - no
       .setTitle('⚙️ **Miscellaneous Commands** ⚙️')
@@ -37,7 +40,7 @@ export default {
         {
           name: 'ℹ️ Server Info Command',
           value: '`/serverinfo` - Shows information about the server.',
-        },
+        }
       )
       .setFooter({
         text: `Requested by ${interaction.user.tag}`,
@@ -53,7 +56,8 @@ export default {
       .addFields(
         {
           name: '🔨 Ban Command',
-          value: '`/ban [user] [duration] {reason}` - Bans a user from the server.',
+          value:
+            '`/ban [user] [duration] {reason}` - Bans a user from the server.',
         },
         {
           name: '🔨 Unban Command',
@@ -70,7 +74,7 @@ export default {
         {
           name: '🧹 Purge Command',
           value: '`/purge [amount]` - Deletes a specified amount of messages.',
-        },
+        }
       )
       .setFooter({
         text: `Requested by ${interaction.user.tag}`,
@@ -81,7 +85,7 @@ export default {
     const embeds = [Server];
     if (
       (interaction.member?.permissions as Readonly<PermissionsBitField>).has(
-        PermissionsBitField.Flags.BanMembers,
+        PermissionsBitField.Flags.BanMembers
       )
     ) {
       embeds.push(Moderation);
@@ -97,7 +101,7 @@ export default {
         // @ts-ignore - no
         .setCustomId('next')
         .setLabel('Next ➡️')
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Primary)
     );
 
     let currentPage = 0;

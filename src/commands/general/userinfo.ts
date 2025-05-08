@@ -1,4 +1,11 @@
-import { Client, CommandInteraction, EmbedBuilder, MessageFlags, Role, User } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  EmbedBuilder,
+  MessageFlags,
+  Role,
+  User,
+} from 'discord.js';
 
 export default {
   name: 'userinfo',
@@ -40,7 +47,9 @@ export default {
       }
 
       const member = await guild.members.fetch(targetUser.id);
-      const joinDate = member.joinedAt ? member.joinedAt.toDateString() : 'Unknown';
+      const joinDate = member.joinedAt
+        ? member.joinedAt.toDateString()
+        : 'Unknown';
       const roles = member.roles.cache
         .filter((role: Role) => role.name !== '@everyone')
         .sort((a: Role, b: Role) => b.position - a.position)
@@ -73,7 +82,7 @@ export default {
           },
           { name: '📅 Joined Server At', value: joinDate, inline: true },
           { name: '🏷️ Nickname', value: nickname, inline: true },
-          { name: '🔖 Roles', value: roles || 'None', inline: true },
+          { name: '🔖 Roles', value: roles || 'None', inline: true }
         )
         .setTimestamp()
         .setFooter({

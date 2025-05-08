@@ -31,9 +31,14 @@ export default {
    * @param {Client} _client - The Discord client.
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    */
-  execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
+  execute: async (
+    _client: Client,
+    interaction: ChatInputCommandInteraction
+  ) => {
     const userId = interaction.options.get('user-id')?.value as string;
-    const reason = (interaction.options.get('reason')?.value as string) || 'No reason provided.';
+    const reason =
+      (interaction.options.get('reason')?.value as string) ||
+      'No reason provided.';
 
     await interaction.deferReply();
 
@@ -59,7 +64,7 @@ export default {
         .setDescription(`**${bannedUser.user.tag}** has been unbanned.`)
         .addFields(
           { name: 'Reason', value: reason },
-          { name: 'Unbanned by', value: interaction.user.tag },
+          { name: 'Unbanned by', value: interaction.user.tag }
         )
         .setTimestamp()
         .setFooter({
@@ -71,7 +76,8 @@ export default {
     } catch (error) {
       console.error(`Error unbanning user: ${error}`);
       await interaction.editReply({
-        content: '❌ **Error:** An error occurred while trying to unban the user.',
+        content:
+          '❌ **Error:** An error occurred while trying to unban the user.',
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });

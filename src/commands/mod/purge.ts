@@ -75,7 +75,8 @@ export default {
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       await interaction.reply({
         content: `❌ An error occurred while trying to delete messages: ${errorMessage}`,
         flags: MessageFlags.Ephemeral,

@@ -1,11 +1,13 @@
 {
-  "name": "fusion-bot-v2",
-  "version": "1.1",
+  "name": "fusion-bot",
+  "version": "1.2",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node dist/index.js",
-    "build": "tsc",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "lint": "eslint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md}'",
+    "start": "bun run src/index.ts",
+    "dev": "bun run src/index.ts -w"
   },
   "dependencies": {
     "discord.js": "^14.19.3",
@@ -16,7 +18,14 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^22.15.17",
+    "@typescript-eslint/eslint-plugin": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.0",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.3",
+    "eslint-plugin-prettier": "^5.4.0",
+    "prettier": "^3.5.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }

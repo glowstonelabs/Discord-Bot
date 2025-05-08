@@ -30,12 +30,17 @@ interface Command {
  * @param exceptions - List of command names to exclude
  * @returns List of command objects
  */
-const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> => {
+const getLocalCommands = async (
+  exceptions: string[] = []
+): Promise<Command[]> => {
   const localCommands: Command[] = [];
   const processedCommandNames = new Set<string>();
 
   // Get all command categories
-  const commandCategories = getAllFiles(path.join(__dirname, '..', 'commands'), true);
+  const commandCategories = getAllFiles(
+    path.join(__dirname, '..', 'commands'),
+    true
+  );
 
   for (const commandCategory of commandCategories) {
     // Get all command files in the category
@@ -55,7 +60,7 @@ const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> =
         if (!commandObject.name || !commandObject.description) {
           console.error(
             `Command file ${commandFile} is missing required properties. Imported object:`,
-            commandObject,
+            commandObject
           );
           continue;
         }
@@ -67,7 +72,9 @@ const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> =
 
         // Prevent duplicate command names
         if (processedCommandNames.has(commandObject.name)) {
-          console.warn(`Duplicate command name detected: "${commandObject.name}". Skipping.`);
+          console.warn(
+            `Duplicate command name detected: "${commandObject.name}". Skipping.`
+          );
           continue;
         }
 
@@ -76,10 +83,15 @@ const getLocalCommands = async (exceptions: string[] = []): Promise<Command[]> =
         processedCommandNames.add(commandObject.name);
       } catch (error) {
         // If file doesn't exist or can't be imported, mark as deleted
-        console.warn(`Command file ${commandFile} not found or could not be imported.`);
+        console.warn(
+          `Command file ${commandFile} not found or could not be imported.`
+        );
 
         // Extract command name from filename
-        const commandName = path.basename(commandFile, path.extname(commandFile));
+        const commandName = path.basename(
+          commandFile,
+          path.extname(commandFile)
+        );
 
         const deletedCommand: Command = {
           name: commandName,

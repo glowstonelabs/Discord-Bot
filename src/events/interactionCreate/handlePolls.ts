@@ -41,12 +41,17 @@ const handlePolls = async (_client: Client, interaction: Interaction) => {
   }
 
   // Check if user has already voted
-  const existingVoteIndex = pollData.userVotes.findIndex((vote) => vote.userId === userId);
+  const existingVoteIndex = pollData.userVotes.findIndex(
+    (vote) => vote.userId === userId
+  );
 
   if (existingVoteIndex >= 0) {
     // Remove vote from previous option
     const oldOptionIndex = pollData.userVotes[existingVoteIndex].optionIndex;
-    pollData.votes[oldOptionIndex] = Math.max(0, pollData.votes[oldOptionIndex] - 1);
+    pollData.votes[oldOptionIndex] = Math.max(
+      0,
+      pollData.votes[oldOptionIndex] - 1
+    );
 
     // Update to new option
     pollData.userVotes[existingVoteIndex].optionIndex = optionIndex;
@@ -70,10 +75,13 @@ const handlePolls = async (_client: Client, interaction: Interaction) => {
     pollEmbed.description!.split('\n\n')[0] +
     '\n\n' +
     pollData.votes
-      .map((count: number, index: number) => `Option ${index + 1}: ${count} votes`)
+      .map(
+        (count: number, index: number) => `Option ${index + 1}: ${count} votes`
+      )
       .join('\n');
   // @ts-ignore stfu
-  const updatedEmbed = EmbedBuilder.from(pollEmbed).setDescription(updatedDescription);
+  const updatedEmbed =
+    EmbedBuilder.from(pollEmbed).setDescription(updatedDescription);
 
   await interaction.update({ embeds: [updatedEmbed] });
 };

@@ -1,7 +1,6 @@
-// .vscode/settings.json
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "deno.enable": true,
-  "cSpell.words": ["devs", "serverinfo", "unban", "Unbans"]
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }

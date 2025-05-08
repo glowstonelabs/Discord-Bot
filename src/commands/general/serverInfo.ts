@@ -39,13 +39,13 @@ export default {
 
       const owner = await guild.fetchOwner();
       const textChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildText,
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildText
       ).size;
       const voiceChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildVoice,
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildVoice
       ).size;
       const categoryChannels = guild.channels.cache.filter(
-        (c: GuildBasedChannel) => c.type === ChannelType.GuildCategory,
+        (c: GuildBasedChannel) => c.type === ChannelType.GuildCategory
       ).size;
       const totalChannels = textChannels + voiceChannels + categoryChannels;
       const memberCount = guild.memberCount;
@@ -95,7 +95,7 @@ export default {
           { name: '🚀 Boosts', value: `${boosts}`, inline: true },
           { name: '⭐ Boost Level', value: `${boostLevel}`, inline: true },
           { name: '😀 Emojis', value: `${emojis}`, inline: true },
-          { name: '📜 Role List', value: roles || 'None', inline: false },
+          { name: '📜 Role List', value: roles || 'None', inline: false }
         )
         .setFooter({
           text: `ID: ${guild.id} | Server Created: ${creationDate}`,
@@ -108,7 +108,8 @@ export default {
     } catch (error) {
       console.error(`Error fetching server info: ${error}`);
       await interaction.editReply({
-        content: '❌ **Error:** An error occurred while fetching server information.',
+        content:
+          '❌ **Error:** An error occurred while fetching server information.',
         //@ts-ignore - This is a valid option
         flags: MessageFlags.Ephemeral,
       });

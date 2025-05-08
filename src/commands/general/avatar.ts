@@ -25,8 +25,9 @@ export default {
   execute: async (_client: Client, interaction: CommandInteraction) => {
     try {
       const targetUser =
-        (interaction.options as CommandInteractionOptionResolver).getUser('target-user') ||
-        interaction.user;
+        (interaction.options as CommandInteractionOptionResolver).getUser(
+          'target-user'
+        ) || interaction.user;
 
       const avatarEmbed = new EmbedBuilder()
         .setColor(0x3498db)

@@ -8,7 +8,10 @@ import * as path from 'path';
  * @param foldersOnly - Whether to return only folders
  * @returns Array of file or folder paths
  */
-export default function getAllFiles(directory: string, foldersOnly = false): string[] {
+export default function getAllFiles(
+  directory: string,
+  foldersOnly = false
+): string[] {
   // Ensure directory exists
   if (!fs.existsSync(directory)) {
     console.warn(`Directory not found: ${directory}`);

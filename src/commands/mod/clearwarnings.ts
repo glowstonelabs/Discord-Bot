@@ -55,9 +55,11 @@ export default {
     }
 
     const targetUserRolePosition = targetUser.roles.highest.position;
-    const requestUserRolePosition = (interaction.member?.roles as GuildMemberRoleManager).highest
-      .position;
-    const botRolePosition = interaction.guild?.members.me?.roles.highest.position;
+    const requestUserRolePosition = (
+      interaction.member?.roles as GuildMemberRoleManager
+    ).highest.position;
+    const botRolePosition =
+      interaction.guild?.members.me?.roles.highest.position;
 
     if (targetUserRolePosition >= requestUserRolePosition) {
       await interaction.editReply({
@@ -69,7 +71,10 @@ export default {
       return;
     }
 
-    if (botRolePosition === undefined || targetUserRolePosition >= botRolePosition) {
+    if (
+      botRolePosition === undefined ||
+      targetUserRolePosition >= botRolePosition
+    ) {
       await interaction.editReply({
         content:
           "🚫 I can't clear warnings for that user because they have the same/higher role than me.",
@@ -85,7 +90,9 @@ export default {
       .setColor('#00FF00')
       // @ts-ignore - no
       .setTitle('Warnings Cleared')
-      .setDescription(`All warnings for **${targetUser.user.tag}** have been cleared.`)
+      .setDescription(
+        `All warnings for **${targetUser.user.tag}** have been cleared.`
+      )
       .setFooter({
         text: `Action by ${interaction.user.tag}`,
         iconURL: interaction.user.displayAvatarURL(),

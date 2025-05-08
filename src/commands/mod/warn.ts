@@ -37,12 +37,13 @@ export default {
    * @param {CommandInteraction} interaction - The interaction object
    */
   execute: async (_client: Client, interaction: CommandInteraction) => {
-    const targetUser = (interaction.options as CommandInteractionOptionResolver).getUser(
-      'target-user',
-    );
+    const targetUser = (
+      interaction.options as CommandInteractionOptionResolver
+    ).getUser('target-user');
     const reason =
-      (interaction.options as CommandInteractionOptionResolver).getString('reason') ||
-      'No reason provided';
+      (interaction.options as CommandInteractionOptionResolver).getString(
+        'reason'
+      ) || 'No reason provided';
 
     await interaction.deferReply({ ephemeral: true });
 
@@ -75,22 +76,29 @@ export default {
     }
 
     const targetUserRolePosition = guildMember.roles.highest.position;
-    const requestUserRolePosition = (interaction.member?.roles as GuildMemberRoleManager).highest
-      .position;
-    const botRolePosition = interaction.guild?.members.me?.roles.highest.position;
+    const requestUserRolePosition = (
+      interaction.member?.roles as GuildMemberRoleManager
+    ).highest.position;
+    const botRolePosition =
+      interaction.guild?.members.me?.roles.highest.position;
 
     if (targetUserRolePosition >= requestUserRolePosition) {
       await interaction.editReply({
-        content: "🚫 You can't warn that user because they have the same/higher role than you.",
+        content:
+          "🚫 You can't warn that user because they have the same/higher role than you.",
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    if (botRolePosition === undefined || targetUserRolePosition >= botRolePosition) {
+    if (
+      botRolePosition === undefined ||
+      targetUserRolePosition >= botRolePosition
+    ) {
       await interaction.editReply({
-        content: "🚫 I can't warn that user because they have the same/higher role than me.",
+        content:
+          "🚫 I can't warn that user because they have the same/higher role than me.",
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });

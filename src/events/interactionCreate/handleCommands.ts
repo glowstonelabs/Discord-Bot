@@ -1,7 +1,12 @@
 import 'dotenv/config';
 import getLocalCommands from '../../utils/getLocalCommands.ts';
 //@ts-ignore
-import { Client, Interaction, MessageFlags, PermissionsBitField } from 'discord.js';
+import {
+  Client,
+  Interaction,
+  MessageFlags,
+  PermissionsBitField,
+} from 'discord.js';
 
 interface Command {
   name: string;
@@ -26,7 +31,9 @@ export default async (client: Client, interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   try {
-    const commandObject = localCommands.find((cmd) => cmd.name === interaction.commandName);
+    const commandObject = localCommands.find(
+      (cmd) => cmd.name === interaction.commandName
+    );
 
     if (!commandObject) return;
 

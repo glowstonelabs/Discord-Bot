@@ -1,4 +1,10 @@
-import { Client, CommandInteraction, EmbedBuilder, MessageFlags, Role } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  EmbedBuilder,
+  MessageFlags,
+  Role,
+} from 'discord.js';
 
 export default {
   name: 'roleinfo',
@@ -17,14 +23,17 @@ export default {
    */
   execute: async (_client: Client, interaction: CommandInteraction) => {
     try {
-      const member = await interaction.guild?.members.fetch(interaction.user.id);
+      const member = await interaction.guild?.members.fetch(
+        interaction.user.id
+      );
       const hasAdminRole = member?.roles.cache.some(
-        (role: Role) => role.name.toLowerCase() === 'administrator',
+        (role: Role) => role.name.toLowerCase() === 'administrator'
       );
 
       if (!hasAdminRole) {
         await interaction.reply({
-          content: '❗ You do not have the "Administrator" role to use this command.',
+          content:
+            '❗ You do not have the "Administrator" role to use this command.',
           flags: MessageFlags.Ephemeral,
         });
         return;
@@ -48,7 +57,7 @@ export default {
             name: '🔒 Permissions',
             value: role.permissions.toArray().join(', ') || 'None',
             inline: true,
-          },
+          }
         )
         .setTimestamp()
         .setFooter({

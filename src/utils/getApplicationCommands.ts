@@ -7,7 +7,10 @@ import { Client } from 'discord.js';
  * @param testServer - Optional test server ID
  * @returns Application commands
  */
-export default async function getApplicationCommands(client: Client, testServer?: string) {
+export default async function getApplicationCommands(
+  client: Client,
+  testServer?: string
+) {
   // Validate client application
   if (!client.application) {
     throw new Error('Client application is not initialized');

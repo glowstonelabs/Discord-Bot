@@ -41,12 +41,13 @@ export default {
   execute: async (_client: Client, interaction: CommandInteraction) => {
     // @ts-ignore - no
     const mentionable = interaction.options.getMentionable('target-user');
-    const duration = (interaction.options as CommandInteractionOptionResolver).getString(
-      'duration',
-    );
+    const duration = (
+      interaction.options as CommandInteractionOptionResolver
+    ).getString('duration');
     const reason =
-      (interaction.options as CommandInteractionOptionResolver).getString('reason') ||
-      'No reason provided';
+      (interaction.options as CommandInteractionOptionResolver).getString(
+        'reason'
+      ) || 'No reason provided';
 
     await interaction.deferReply({ ephemeral: true });
 
@@ -72,7 +73,8 @@ export default {
     const durationMs = ms(duration);
     if (!durationMs || durationMs < 1000 || durationMs > 2419200000) {
       await interaction.editReply({
-        content: '❌ Please provide a valid duration between 1 second and 28 days.',
+        content:
+          '❌ Please provide a valid duration between 1 second and 28 days.',
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });
@@ -80,22 +82,29 @@ export default {
     }
 
     const targetUserRolePosition = targetUser.roles.highest.position;
-    const requestUserRolePosition = (interaction.member?.roles as GuildMemberRoleManager).highest
-      .position;
-    const botRolePosition = interaction.guild?.members.me?.roles.highest.position;
+    const requestUserRolePosition = (
+      interaction.member?.roles as GuildMemberRoleManager
+    ).highest.position;
+    const botRolePosition =
+      interaction.guild?.members.me?.roles.highest.position;
 
     if (targetUserRolePosition >= requestUserRolePosition) {
       await interaction.editReply({
-        content: "🚫 You can't timeout that user because they have the same/higher role than you.",
+        content:
+          "🚫 You can't timeout that user because they have the same/higher role than you.",
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    if (botRolePosition === undefined || targetUserRolePosition >= botRolePosition) {
+    if (
+      botRolePosition === undefined ||
+      targetUserRolePosition >= botRolePosition
+    ) {
       await interaction.editReply({
-        content: "🚫 I can't timeout that user because they have the same/higher role than me.",
+        content:
+          "🚫 I can't timeout that user because they have the same/higher role than me.",
         // @ts-ignore - no
         flags: MessageFlags.Ephemeral,
       });
@@ -113,7 +122,7 @@ export default {
         .addFields(
           // @ts-ignore - no
           { name: 'Duration', value: duration, inline: true },
-          { name: 'Reason', value: reason, inline: true },
+          { name: 'Reason', value: reason, inline: true }
         )
         .setFooter({
           text: `Action by ${interaction.user.tag}`,

@@ -34,7 +34,9 @@ export default async (client: Client, baseDir: string): Promise<void> => {
 
       for (const categoryPath of eventCategories) {
         const category = path.basename(categoryPath);
-        const eventFiles = getAllFiles(categoryPath).filter((file) => file.endsWith('.ts'));
+        const eventFiles = getAllFiles(categoryPath).filter((file) =>
+          file.endsWith('.ts')
+        );
 
         for (const eventFile of eventFiles) {
           try {
@@ -48,12 +50,18 @@ export default async (client: Client, baseDir: string): Promise<void> => {
                 try {
                   await eventHandler(client, ...args);
                 } catch (handlerError) {
-                  console.error(`Error in event handler ${eventName}:`, handlerError);
+                  console.error(
+                    `Error in event handler ${eventName}:`,
+                    handlerError
+                  );
                 }
               });
             }
           } catch (importError) {
-            console.error(`Error importing event file ${eventFile}:`, importError);
+            console.error(
+              `Error importing event file ${eventFile}:`,
+              importError
+            );
           }
         }
       }

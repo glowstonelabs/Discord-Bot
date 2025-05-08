@@ -20,7 +20,7 @@ interface Command {
  */
 function areOptionsDifferent(
   existingOptions: CommandOption[] = [],
-  localOptions: CommandOption[] = [],
+  localOptions: CommandOption[] = []
 ): boolean {
   // Different number of options
   if (existingOptions.length !== localOptions.length) {
@@ -46,7 +46,7 @@ function areOptionsDifferent(
  */
 function areChoicesDifferent(
   choices1: Array<{ name: string; value: string | number }> = [],
-  choices2: Array<{ name: string; value: string | number }> = [],
+  choices2: Array<{ name: string; value: string | number }> = []
 ): boolean {
   if (choices1.length !== choices2.length) {
     return true;
@@ -54,14 +54,18 @@ function areChoicesDifferent(
 
   return choices1.some(
     (choice, index) =>
-      choice.name !== choices2[index].name || choice.value !== choices2[index].value,
+      choice.name !== choices2[index].name ||
+      choice.value !== choices2[index].value
   );
 }
 
 /**
  * Compare existing and local commands
  */
-export function areCommandsDifferent(existingCommand: Command, localCommand: Command): boolean {
+export function areCommandsDifferent(
+  existingCommand: Command,
+  localCommand: Command
+): boolean {
   // Compare descriptions
   if (existingCommand.description !== localCommand.description) {
     return true;

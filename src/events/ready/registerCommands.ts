@@ -16,7 +16,10 @@ import getApplicationCommands from '../../utils/getApplicationCommands.ts';
 import areCommandsDifferent from '../../utils/areCommandsDifferent.ts';
 
 // Refined type definitions
-type Option = (ApplicationCommandOptionData | ApplicationCommandSubGroupData) & {
+type Option = (
+  | ApplicationCommandOptionData
+  | ApplicationCommandSubGroupData
+) & {
   choices?: ApplicationCommandOptionChoiceData<string | number>[];
   type: ApplicationCommandOptionType;
 };
@@ -38,7 +41,10 @@ export default async (client: Client): Promise<void> => {
     const testServer = process.env.TESTSERVER;
 
     // Retrieve application commands and local commands
-    const applicationCommands = await getApplicationCommands(client, testServer);
+    const applicationCommands = await getApplicationCommands(
+      client,
+      testServer
+    );
     const localCommands = await getLocalCommands();
 
     // Fetch existing commands
@@ -60,14 +66,21 @@ export default async (client: Client): Promise<void> => {
 
     // Second pass: Register or update commands
     for (const localCommand of localCommands) {
-      const { name, description, options = [], deleted } = localCommand as Command;
+      const {
+        name,
+        description,
+        options = [],
+        deleted,
+      } = localCommand as Command;
 
       // Skip if already processed or marked for deletion
       if (processedCommandNames.has(name) || deleted) {
         if (deleted) {
           console.log(`⏩ Skipping deleted command "${name}"`);
         } else {
-          console.warn(`⚠️ Duplicate command name detected: "${name}". Skipping.`);
+          console.warn(
+            `⚠️ Duplicate command name detected: "${name}". Skipping.`
+          );
         }
         continue;
       }
@@ -91,7 +104,7 @@ export default async (client: Client): Promise<void> => {
               description: existingCommand.description,
               options: existingCommand.options as Option[] | undefined,
             },
-            commandData,
+            commandData
           );
 
           // Update only if there are differences
