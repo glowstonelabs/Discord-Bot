@@ -3,6 +3,7 @@ import getLocalCommands from '../../utils/getLocalCommands.ts';
 //@ts-ignore
 import {
   Client,
+  // @ts-ignore
   Interaction,
   MessageFlags,
   PermissionsBitField,
