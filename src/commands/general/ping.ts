@@ -36,7 +36,7 @@ export default {
       await interaction.deferReply();
 
       // @ts-ignore - no
-      const reply = await interaction.withResponse();
+      const reply = await interaction.fetchReply();
 
       // Calculate metrics
       const ping = reply.createdTimestamp - interaction.createdTimestamp;
