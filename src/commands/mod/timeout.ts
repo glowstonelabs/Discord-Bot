@@ -8,6 +8,7 @@ import {
   GuildMemberRoleManager,
   // @ts-ignore - no
   PermissionFlagsBits,
+  MessageFlags,
 } from 'discord.js';
 // @ts-ignore - no
 import ms from 'ms';
@@ -49,14 +50,14 @@ export default {
         'reason'
       ) || 'No reason provided';
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: 64 });
 
     const targetUser = await interaction.guild?.members.fetch(mentionable?.id);
     if (!targetUser) {
       await interaction.editReply({
         content: "❌ That user doesn't exist in this server.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -65,7 +66,7 @@ export default {
       await interaction.editReply({
         content: "🤖 I can't timeout a bot.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -76,7 +77,7 @@ export default {
         content:
           '❌ Please provide a valid duration between 1 second and 28 days.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -93,7 +94,7 @@ export default {
         content:
           "🚫 You can't timeout that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -106,7 +107,7 @@ export default {
         content:
           "🚫 I can't timeout that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -130,13 +131,16 @@ export default {
         })
         .setTimestamp();
       // @ts-ignore - no
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({
+        embeds: [embed],
+        flags: 64,
+      });
     } catch (error) {
       console.error(`Error timing out user: ${error}`);
       await interaction.editReply({
         content: '❌ An error occurred while trying to timeout the user.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
     }
   },

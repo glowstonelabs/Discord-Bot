@@ -45,13 +45,13 @@ export default {
         'reason'
       ) || 'No reason provided';
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: 64 });
 
     if (!targetUser) {
       await interaction.editReply({
         content: "❌ That user doesn't exist in this server.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -60,7 +60,7 @@ export default {
       await interaction.editReply({
         content: "🤖 I can't warn a bot.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -70,7 +70,7 @@ export default {
       await interaction.editReply({
         content: '❌ That user is not a member of this server.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -87,7 +87,7 @@ export default {
         content:
           "🚫 You can't warn that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -100,7 +100,7 @@ export default {
         content:
           "🚫 I can't warn that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -119,6 +119,9 @@ export default {
       })
       .setTimestamp();
     // @ts-ignore - no
-    await interaction.editReply({ embeds: [embed], ephemeral: true });
+    await interaction.editReply({
+      embeds: [embed],
+      flags: 64,
+    });
   },
 };

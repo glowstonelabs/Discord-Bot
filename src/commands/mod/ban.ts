@@ -52,7 +52,7 @@ export default {
       await interaction.editReply({
         content: '❌ **Error:** Target user option is missing.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -63,7 +63,7 @@ export default {
     const duration =
       (interaction.options.get('duration')?.value as string) || 'Permanent';
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: 64 });
 
     try {
       const targetUser = await interaction.guild?.members.fetch(
@@ -73,7 +73,7 @@ export default {
         await interaction.editReply({
           content: '❌ **Error:** User not found.',
           // @ts-ignore - no
-          flags: MessageFlags.Ephemeral,
+          flags: 64,
         });
         return;
       }
@@ -90,7 +90,7 @@ export default {
           content:
             "🚫 You can't ban that user because they have the same/higher role than you.",
           // @ts-ignore - no
-          flags: MessageFlags.Ephemeral,
+          flags: 64,
         });
         return;
       }
@@ -103,7 +103,7 @@ export default {
           content:
             "🚫 I can't ban that user because they have the same/higher role than me.",
           // @ts-ignore - no
-          flags: MessageFlags.Ephemeral,
+          flags: 64,
         });
         return;
       }
@@ -159,7 +159,7 @@ export default {
         content:
           '❌ **Error:** An error occurred while trying to ban the user.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
     }
   },

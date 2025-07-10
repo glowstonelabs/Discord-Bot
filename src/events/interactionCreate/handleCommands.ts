@@ -8,6 +8,7 @@ import {
   MessageFlags,
   PermissionsBitField,
 } from 'discord.js';
+import { handleXpDropClaim } from '../messageCreate/handleXpDrop';
 
 interface Command {
   name: string;
@@ -29,6 +30,9 @@ const localCommands: Command[] = (await getLocalCommands()) as Command[];
  * @param {Interaction} interaction - The interaction object.
  */
 export default async (client: Client, interaction: Interaction) => {
+  // Always handle XP drop claim buttons
+  await handleXpDropClaim(interaction);
+
   if (!interaction.isChatInputCommand()) return;
 
   try {

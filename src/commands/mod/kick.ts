@@ -45,7 +45,7 @@ export default {
     if (!targetUserOption) {
       await interaction.reply({
         content: '❌ **Error:** Target user option is missing.',
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -54,13 +54,13 @@ export default {
       (interaction.options.get('reason')?.value as string) ||
       'No reason provided.';
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: 64 });
 
     if (!interaction.guild) {
       await interaction.editReply({
         content: '❌ **Error:** This command can only be used in a server.',
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -72,7 +72,7 @@ export default {
       await interaction.editReply({
         content: "❌ **Error:** That user doesn't exist in this server.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -89,7 +89,7 @@ export default {
         content:
           "🚫 You can't kick that user because they have the same/higher role than you.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -102,7 +102,7 @@ export default {
         content:
           "🚫 I can't kick that user because they have the same/higher role than me.",
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
       return;
     }
@@ -122,14 +122,17 @@ export default {
         })
         .setTimestamp();
       // @ts-ignore - no
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({
+        embeds: [embed],
+        flags: 64,
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       await interaction.editReply({
         content: `❌ An error occurred while trying to kick the user: ${errorMessage}`,
         // @ts-ignore - no
-        flags: MessageFlags.Ephemeral,
+        flags: 64,
       });
     }
   },

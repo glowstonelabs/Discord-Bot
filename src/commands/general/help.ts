@@ -9,6 +9,7 @@ import {
   ComponentType,
   EmbedBuilder,
   PermissionsBitField,
+  MessageFlags,
 } from 'discord.js';
 
 export default {
@@ -126,7 +127,10 @@ export default {
         }
         i.update({ embeds: [embeds[currentPage]] });
       } else {
-        i.reply({ content: 'You cannot use these buttons.', ephemeral: true });
+        i.reply({
+          content: 'You cannot use these buttons.',
+          flags: MessageFlags.Ephemeral,
+        });
       }
     });
 
